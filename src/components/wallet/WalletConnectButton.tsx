@@ -7,6 +7,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { NetworkBadge } from '@/components/ui/network-badge';
 import { NetworkType } from '@/lib/types/wallet';
 
@@ -18,9 +25,11 @@ interface WalletConnectButtonProps {
 export function WalletConnectButton({ onConnect, variant = 'default' }: WalletConnectButtonProps) {
   const [isConnected, setIsConnected] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkType>('TRON');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleConnect = () => {
+  const handleWalletSelect = (walletType: string) => {
     setIsConnected(true);
+    setIsDialogOpen(false);
     onConnect?.();
   };
 
@@ -30,12 +39,72 @@ export function WalletConnectButton({ onConnect, variant = 'default' }: WalletCo
 
   const networks: NetworkType[] = ['TRON', 'ERC20', 'BTC'];
 
+  const walletProviders = [
+    {
+      id: 'metamask',
+      name: 'MetaMask',
+      description: 'Conectar com MetaMask',
+      icon: '🦊',
+    },
+    {
+      id: 'walletconnect',
+      name: 'WalletConnect',
+      description: 'Escanear com WalletConnect',
+      icon: '📱',
+    },
+    {
+      id: 'coinbase',
+      name: 'Coinbase Wallet',
+      description: 'Conectar com Coinbase',
+      icon: '🔷',
+    },
+    {
+      id: 'tronlink',
+      name: 'TronLink',
+      description: 'Conectar com TronLink',
+      icon: '🔴',
+    },
+  ];
+
   if (!isConnected) {
     return (
-      <Button onClick={handleConnect} variant={variant} className="gap-2">
-        <WalletIcon className="w-4 h-4" />
-        Conectar Wallet
-      </Button>
+      <>
+        <Button onClick={() => setIsDialogOpen(true)} variant={variant} className="gap-2">
+          <WalletIcon className="w-4 h-4" />
+          Conectar Wallet
+        </Button>
+
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-md bg-card border-border">
+            <DialogHeader>
+              <DialogTitle>Conectar Wallet</DialogTitle>
+              <DialogDescription>
+                Escolha um provedor para conectar sua carteira
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-3 py-4">
+              {walletProviders.map((provider) => (
+                <button
+                  key={provider.id}
+                  onClick={() => handleWalletSelect(provider.id)}
+                  className="flex items-center gap-4 p-4 rounded-lg border border-border bg-secondary/50 hover:bg-secondary hover:border-primary/50 transition-all group"
+                >
+                  <div className="text-3xl">{provider.icon}</div>
+                  <div className="flex-1 text-left">
+                    <div className="font-medium text-foreground group-hover:text-primary transition-colors">
+                      {provider.name}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {provider.description}
+                    </div>
+                  </div>
+                  <ChevronDown className="w-4 h-4 -rotate-90 text-muted-foreground group-hover:text-primary transition-colors" />
+                </button>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
