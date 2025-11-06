@@ -16,11 +16,11 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-card">
+      <header className="border-b border-border/50 bg-card/50 backdrop-blur-lg sticky top-0 z-10">
         <div className="container max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center shadow-glow">
                 <Wallet className="w-5 h-5 text-primary-foreground" />
               </div>
               <h1 className="text-xl font-bold">CryptoWallet</h1>
@@ -55,11 +55,11 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <Card className="p-6">
+        <Card className="p-6 bg-gradient-card border-border/50">
           <h2 className="text-lg font-semibold mb-4">Ações Rápidas</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             <Button
-              className="h-auto py-4 justify-start gap-3"
+              className="h-auto py-4 justify-start gap-3 shadow-glow"
               onClick={() => navigate('/deposit')}
             >
               <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
@@ -87,7 +87,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Recent Transactions */}
-        <Card className="p-6">
+        <Card className="p-6 bg-gradient-card border-border/50">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Transações Recentes</h2>
             <Button

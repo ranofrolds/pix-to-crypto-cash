@@ -1,52 +1,103 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { PixScanMock } from '@/components/pix/PixScanMock';
-import { PixParsedCard } from '@/components/pix/PixParsedCard';
+import { AmountInput } from '@/components/pix/AmountInput';
+import { ConversionHint } from '@/components/pix/ConversionHint';
+import { PixPaymentCard } from '@/components/pix/PixPaymentCard';
 import { NetworkSelector } from '@/components/wallet/NetworkSelector';
 import { PixPayload } from '@/lib/types/pix';
 import { NetworkType, AssetSymbol } from '@/lib/types/wallet';
-import { formatCurrency, formatCrypto } from '@/lib/utils/format';
 import { conversionRates } from '@/lib/mocks/fixtures';
 import { toast } from '@/hooks/use-toast';
 
 export default function DepositPix() {
   const navigate = useNavigate();
-  const [pixData, setPixData] = useState<PixPayload | null>(null);
+  const [amountBRL, setAmountBRL] = useState(0);
   const [selectedAsset, setSelectedAsset] = useState<AssetSymbol>('USDT');
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkType>('TRON');
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pixData, setPixData] = useState<PixPayload | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const estimatedAmount = pixData ? pixData.valor / conversionRates.USDT_BRL : 0;
+  const fee = amountBRL > 0 ? Math.max(3.90, amountBRL * 0.015) : 0;
+  const estimatedAmount = amountBRL > 0 ? (amountBRL / conversionRates.USDT_BRL) : 0;
+  const totalAmount = amountBRL + fee;
 
-  const handleConfirm = () => {
-    setShowConfirmDialog(false);
+  const amountError = amountBRL > 0 && amountBRL < 1 
+    ? 'Valor mínimo é R$ 1,00'
+    : amountBRL > 50000 
+    ? 'Valor máximo é R$ 50.000,00'
+    : '';
+
+  const canGenerate = amountBRL >= 1 && amountBRL <= 50000 && !pixData;
+
+  const handleGeneratePix = () => {
+    setIsGenerating(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      const mockPix: PixPayload = {
+        raw: `00020126580014br.gov.bcb.pix0136${Date.now()}@cryptowallet.com.br5204000053039865802BR5920CRYPTOWALLET LTDA6009SAO PAULO62070503***6304${Math.random().toString(36).substring(7).toUpperCase()}`,
+        chave: 'pix@cryptowallet.com.br',
+        valor: totalAmount,
+        descricao: `Depósito para ${selectedAsset} na rede ${selectedNetwork}`,
+        txid: `PIX${Date.now()}${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+        beneficiario: 'CRYPTOWALLET LTDA',
+        expiraEm: new Date(Date.now() + 1000 * 60 * 5), // 5 minutes
+        cidade: 'SAO PAULO',
+      };
+      
+      setPixData(mockPix);
+      setIsGenerating(false);
+      toast({
+        title: 'PIX Gerado!',
+        description: 'Pague usando seu aplicativo bancário',
+      });
+    }, 1000);
+  };
+
+  const handleCancel = () => {
+    setPixData(null);
+  };
+
+  const handleMarkAsPaid = () => {
     toast({
       title: 'Depósito registrado!',
       description: 'Seu depósito está sendo processado (simulado)',
     });
-    setTimeout(() => navigate('/history'), 1500);
+    setTimeout(() => {
+      navigate('/history');
+    }, 1500);
+  };
+
+  const handleExpire = () => {
+    toast({
+      title: 'PIX Expirado',
+      description: 'Este PIX expirou. Gere um novo para continuar.',
+      variant: 'destructive',
+    });
   };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-card sticky top-0 z-10">
+      <header className="border-b border-border/50 bg-card/50 backdrop-blur-lg sticky top-0 z-10">
         <div className="container max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate('/deposit')}
+              onClick={() => navigate(pixData ? '#' : '/deposit')}
+              disabled={!!pixData}
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>
               <h1 className="text-xl font-bold">Depositar via PIX</h1>
-              <p className="text-sm text-muted-foreground">Escaneie ou cole o código PIX</p>
+              <p className="text-sm text-muted-foreground">
+                {pixData ? 'Complete o pagamento' : 'Configure seu depósito'}
+              </p>
             </div>
           </div>
         </div>
@@ -54,28 +105,30 @@ export default function DepositPix() {
 
       <div className="container max-w-2xl mx-auto px-4 py-6 space-y-6">
         {!pixData ? (
-          <PixScanMock onScan={setPixData} />
-        ) : (
           <>
-            <PixParsedCard data={pixData} />
+            {/* Amount Input */}
+            <Card className="p-6 bg-gradient-card border-border/50">
+              <AmountInput
+                value={amountBRL}
+                onChange={setAmountBRL}
+                error={amountError}
+                min={1}
+                max={50000}
+              />
+            </Card>
 
-            <Card className="p-6 space-y-4">
-              <div>
-                <h2 className="text-lg font-semibold mb-1">Receber em</h2>
-                <p className="text-sm text-muted-foreground">Escolha o ativo e rede</p>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Ativo</label>
-                  <div className="flex gap-2">
+            {/* Asset Selection */}
+            <Card className="p-6 bg-gradient-card border-border/50">
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-3 block">Ativo a Creditar</label>
+                  <div className="grid grid-cols-3 gap-2">
                     {(['USDT', 'BTC', 'ETH'] as AssetSymbol[]).map((asset) => (
                       <Button
                         key={asset}
                         variant={selectedAsset === asset ? 'default' : 'outline'}
-                        size="sm"
                         onClick={() => setSelectedAsset(asset)}
-                        className="flex-1"
+                        className="h-12"
                       >
                         {asset}
                       </Button>
@@ -89,76 +142,53 @@ export default function DepositPix() {
                   onChange={setSelectedNetwork}
                 />
               </div>
-
-              <div className="p-4 rounded-lg bg-accent/10 border border-accent/20">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-muted-foreground">Você receberá aproximadamente</span>
-                </div>
-                <p className="text-2xl font-bold text-accent">
-                  {formatCrypto(estimatedAmount, selectedAsset)}
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Taxa de conversão: {formatCurrency(conversionRates.USDT_BRL)} por USDT
-                </p>
-              </div>
             </Card>
 
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => setPixData(null)}
-              >
-                Voltar
-              </Button>
-              <Button
-                className="flex-1 gap-2"
-                onClick={() => setShowConfirmDialog(true)}
-              >
-                Confirmar Depósito
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </div>
+            {/* Conversion Preview */}
+            {amountBRL > 0 && !amountError && (
+              <ConversionHint
+                amountBRL={amountBRL}
+                asset={selectedAsset}
+                estimatedAmount={estimatedAmount}
+                fee={fee}
+                isLoading={isGenerating}
+              />
+            )}
+
+            {/* Generate Button */}
+            <Button
+              className="w-full h-14 text-lg shadow-glow gap-2"
+              onClick={handleGeneratePix}
+              disabled={!canGenerate || isGenerating}
+            >
+              {isGenerating ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                  Gerando PIX...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-5 h-5" />
+                  Gerar PIX
+                </>
+              )}
+            </Button>
+
+            {!canGenerate && amountBRL === 0 && (
+              <p className="text-center text-sm text-muted-foreground">
+                Informe um valor válido para gerar o PIX
+              </p>
+            )}
           </>
+        ) : (
+          <PixPaymentCard
+            pixData={pixData}
+            onCancel={handleCancel}
+            onMarkAsPaid={handleMarkAsPaid}
+            onExpire={handleExpire}
+          />
         )}
       </div>
-
-      {/* Confirmation Dialog */}
-      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmar Depósito PIX</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Valor PIX</span>
-              <span className="font-semibold">{pixData && formatCurrency(pixData.valor)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Receber</span>
-              <span className="font-semibold">{formatCrypto(estimatedAmount, selectedAsset)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Rede</span>
-              <span className="font-semibold">{selectedNetwork}</span>
-            </div>
-            <div className="p-3 rounded-lg bg-muted">
-              <p className="text-sm text-muted-foreground">
-                Esta é uma simulação. Em produção, o pagamento seria processado e os fundos
-                creditados após confirmação.
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleConfirm}>
-              Confirmar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
