@@ -93,7 +93,7 @@ export default function Index() {
                 size="lg"
                 variant="outline"
                 className="text-lg h-14 px-8"
-                onClick={() => navigate('/deposit/pix')}
+                onClick={() => navigate('/deposit')}
               >
                 Depositar com PIX
               </Button>
