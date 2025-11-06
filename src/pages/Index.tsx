@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { Wallet, ArrowRight, Shield, Zap, Globe, Menu } from 'lucide-react';
+import { Wallet, ArrowRight, Shield, Zap, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { WalletConnectButton } from '@/components/wallet/WalletConnectButton';
 
 export default function Index() {
   const navigate = useNavigate();
@@ -43,23 +44,15 @@ export default function Index() {
                 CryptoWallet
               </h1>
             </div>
-            <nav className="hidden md:flex items-center gap-6">
-              <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <nav className="flex items-center gap-4">
+              <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block">
                 Recursos
               </a>
-              <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block">
                 Como Funciona
               </a>
-              <Button onClick={() => navigate('/dashboard')} variant="outline">
-                Acessar
-              </Button>
-              <Button onClick={() => navigate('/dashboard')} className="shadow-glow">
-                Conectar Wallet
-              </Button>
+              <WalletConnectButton onConnect={() => navigate('/dashboard')} />
             </nav>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="w-5 h-5" />
-            </Button>
           </div>
         </div>
       </header>

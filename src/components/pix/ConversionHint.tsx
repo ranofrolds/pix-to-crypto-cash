@@ -30,28 +30,32 @@ export function ConversionHint({ amountBRL, asset, estimatedAmount, fee, isLoadi
         
         <div className="flex items-center gap-3">
           <div className="flex-1">
-            <p className="text-sm text-muted-foreground mb-1">Valor PIX</p>
-            <p className="text-xl font-bold">{formatCurrency(amountBRL)}</p>
+            <p className="text-xs text-muted-foreground mb-1">Valor PIX</p>
+            <p className="text-xl font-bold font-mono">{formatCurrency(amountBRL)}</p>
           </div>
           
           <ArrowRight className="w-5 h-5 text-primary flex-shrink-0" />
           
           <div className="flex-1">
-            <p className="text-sm text-muted-foreground mb-1">Cripto</p>
-            <p className="text-xl font-bold text-accent">
+            <p className="text-xs text-muted-foreground mb-1">Você recebe</p>
+            <p className="text-xl font-bold text-accent font-mono">
               {formatCrypto(estimatedAmount, asset)}
             </p>
           </div>
         </div>
 
-        <div className="pt-3 border-t border-border/50 space-y-1">
+        <div className="pt-3 border-t border-border/50 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Taxa de processamento</span>
-            <span className="font-medium">{formatCurrency(fee)}</span>
+            <span className="font-medium font-mono">{formatCurrency(fee)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Total a pagar</span>
-            <span className="font-semibold">{formatCurrency(amountBRL + fee)}</span>
+            <span className="text-muted-foreground">Estimativa de gas</span>
+            <span className="font-medium font-mono text-warning">~0.5 TRX</span>
+          </div>
+          <div className="flex justify-between text-base font-semibold pt-2 border-t border-border/30">
+            <span>Total a pagar</span>
+            <span className="font-mono">{formatCurrency(amountBRL + fee)}</span>
           </div>
         </div>
       </div>

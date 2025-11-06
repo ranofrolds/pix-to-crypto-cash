@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { Wallet, ArrowUpRight, History, Settings } from 'lucide-react';
+import { Wallet, ArrowUpRight, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { WalletConnectButton } from '@/components/wallet/WalletConnectButton';
 import { BalanceCard } from '@/components/wallet/BalanceCard';
 import { TransactionItem } from '@/components/wallet/TransactionItem';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -19,19 +20,13 @@ export default function Dashboard() {
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-lg sticky top-0 z-10">
         <div className="container max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center shadow-glow">
                 <Wallet className="w-5 h-5 text-primary-foreground" />
               </div>
               <h1 className="text-xl font-bold">CryptoWallet</h1>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/settings')}
-            >
-              <Settings className="w-5 h-5" />
-            </Button>
+            <WalletConnectButton />
           </div>
         </div>
       </header>
