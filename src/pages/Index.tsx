@@ -3,9 +3,13 @@ import { Wallet, ArrowRight, Shield, Zap, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { WalletConnectButton } from '@/components/wallet/WalletConnectButton';
+import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 
 export default function Index() {
   const navigate = useNavigate();
+  const featuresAnimation = useScrollAnimation();
+  const howItWorksAnimation = useScrollAnimation();
+  const ctaAnimation = useScrollAnimation();
 
   const features = [
     {
@@ -103,7 +107,13 @@ export default function Index() {
       </section>
 
       {/* Features */}
-      <section id="features" className="relative py-20 border-y border-border/50">
+      <section 
+        id="features" 
+        ref={featuresAnimation.ref}
+        className={`relative py-20 border-y border-border/50 transition-all duration-700 ${
+          featuresAnimation.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="container max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Por que escolher a CryptoWallet?</h2>
@@ -114,7 +124,10 @@ export default function Index() {
             {features.map((feature, index) => (
               <Card
                 key={index}
-                className="p-8 bg-gradient-card border-border/50 hover:shadow-glow transition-all duration-300 group"
+                className={`p-8 bg-gradient-card border-border/50 hover:shadow-glow transition-all duration-500 group ${
+                  featuresAnimation.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                }`}
+                style={{ transitionDelay: `${index * 150}ms` }}
               >
                 <div className="w-14 h-14 rounded-2xl bg-gradient-primary flex items-center justify-center mb-6 shadow-glow group-hover:scale-110 transition-transform">
                   <feature.icon className="w-7 h-7 text-primary-foreground" />
@@ -128,7 +141,13 @@ export default function Index() {
       </section>
 
       {/* How it works */}
-      <section id="how-it-works" className="relative py-20">
+      <section 
+        id="how-it-works" 
+        ref={howItWorksAnimation.ref}
+        className={`relative py-20 transition-all duration-700 ${
+          howItWorksAnimation.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="container max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Como Funciona</h2>
@@ -141,7 +160,13 @@ export default function Index() {
               { step: '02', title: 'Deposite com PIX', desc: 'Escolha o valor e gere o código PIX' },
               { step: '03', title: 'Receba Cripto', desc: 'Seus ativos digitais em segundos' },
             ].map((item, index) => (
-              <div key={index} className="text-center relative">
+              <div 
+                key={index} 
+                className={`text-center relative transition-all duration-500 ${
+                  howItWorksAnimation.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                }`}
+                style={{ transitionDelay: `${index * 150}ms` }}
+              >
                 <div className="text-6xl font-bold text-primary/20 mb-4">{item.step}</div>
                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                 <p className="text-muted-foreground">{item.desc}</p>
@@ -155,7 +180,12 @@ export default function Index() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-20">
+      <section 
+        ref={ctaAnimation.ref}
+        className={`relative py-20 transition-all duration-700 ${
+          ctaAnimation.isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+        }`}
+      >
         <div className="container max-w-7xl mx-auto px-4">
           <Card className="p-12 md:p-16 bg-gradient-primary border-0 text-center shadow-glow">
             <h2 className="text-3xl md:text-5xl font-bold text-primary-foreground mb-4">
