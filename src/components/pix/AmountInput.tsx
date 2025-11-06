@@ -12,12 +12,15 @@ interface AmountInputProps {
 
 export function AmountInput({ value, onChange, min = 1, max = 50000, error }: AmountInputProps) {
   const [displayValue, setDisplayValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
-    if (value > 0) {
+    if (!isFocused && value > 0) {
       setDisplayValue(formatToBRL(value));
+    } else if (!isFocused && value === 0) {
+      setDisplayValue('');
     }
-  }, [value]);
+  }, [value, isFocused]);
 
   const formatToBRL = (val: number): string => {
     return val.toLocaleString('pt-BR', {
@@ -34,15 +37,22 @@ export function AmountInput({ value, onChange, min = 1, max = 50000, error }: Am
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
+    
+    // Allow only numbers and comma
+    if (input && !/^[\d,]*$/.test(input)) {
+      return;
+    }
+    
+    setDisplayValue(input);
     const numericValue = parseFromBRL(input);
     
     if (numericValue <= max) {
       onChange(numericValue);
-      setDisplayValue(input);
     }
   };
 
   const handleBlur = () => {
+    setIsFocused(false);
     if (value > 0) {
       setDisplayValue(formatToBRL(value));
     } else {
@@ -51,6 +61,7 @@ export function AmountInput({ value, onChange, min = 1, max = 50000, error }: Am
   };
 
   const handleFocus = () => {
+    setIsFocused(true);
     if (value > 0) {
       setDisplayValue(value.toString().replace('.', ','));
     }
