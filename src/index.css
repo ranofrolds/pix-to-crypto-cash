@@ -76,8 +76,8 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
     background-image: 
-      radial-gradient(circle at 1px 1px, hsl(var(--foreground) / 0.04) 1px, transparent 0);
-    background-size: 32px 32px;
+      radial-gradient(circle at 1px 1px, hsl(var(--foreground) / 0.12) 1px, transparent 0);
+    background-size: 24px 24px;
     background-position: 0 0;
   }
 }
