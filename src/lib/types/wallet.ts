@@ -1,4 +1,4 @@
-export type AssetSymbol = 'USDT' | 'BTC' | 'ETH' | 'BRL';
+export type AssetSymbol = 'USDT' | 'BTC' | 'ETH' | 'BRL' | 'BRLA';
 export type NetworkType = 'TRON' | 'ERC20' | 'BTC' | 'PIX';
 export type TransactionStatus = 'pending' | 'success' | 'failed';
 export type TransactionType = 'deposit' | 'withdrawal' | 'swap';
@@ -35,4 +35,5 @@ export interface WalletBalance {
   USDT: number;
   BTC: number;
   ETH: number;
+  BRLA: number;
 }

@@ -1,18 +1,31 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Wallet, ArrowUpRight, History } from 'lucide-react';
+import { Wallet, ArrowUpRight, History, Eye, EyeOff, ArrowDownLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { WalletConnectButton } from '@/components/wallet/WalletConnectButton';
 import { BalanceCard } from '@/components/wallet/BalanceCard';
 import { TransactionItem } from '@/components/wallet/TransactionItem';
 import { EmptyState } from '@/components/ui/empty-state';
+import { TransactionDetailsModal } from '@/components/wallet/TransactionDetailsModal';
 import { mockBalance, mockTransactions, mockAssets } from '@/lib/mocks/fixtures';
+import { Transaction } from '@/lib/types/wallet';
+import { formatCurrency, formatCrypto } from '@/lib/utils/format';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [balanceVisible, setBalanceVisible] = useState(true);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
   
-  const totalUSD = mockAssets.reduce((sum, asset) => sum + asset.balanceUSD, 0);
+  const brlaAsset = mockAssets.find(asset => asset.symbol === 'BRLA');
+  const totalBRLA = brlaAsset?.balance || 0;
   const recentTransactions = mockTransactions.slice(0, 5);
+
+  const handleTransactionClick = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -32,54 +45,90 @@ export default function Dashboard() {
       </header>
 
       <div className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
-        {/* Balance Cards */}
-        <div className="grid gap-4 md:grid-cols-2">
-          <BalanceCard
-            title="Saldo Total"
-            amount={totalUSD}
-            currency="USD"
-            change={5.2}
-            isMain
-          />
-          <BalanceCard
-            title="Saldo em Reais"
-            amount={mockBalance.BRL}
-            currency="BRL"
-            change={-1.3}
-          />
-        </div>
-
-        {/* Quick Actions */}
+        {/* Balance Section */}
         <Card className="p-6 bg-gradient-card border-border/50">
-          <h2 className="text-lg font-semibold mb-4">Ações Rápidas</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Wallet className="w-5 h-5 text-muted-foreground" />
+              <h2 className="text-sm text-muted-foreground">Visão geral</h2>
+            </div>
             <Button
-              className="h-auto py-4 justify-start gap-3 shadow-glow"
+              variant="ghost"
+              size="icon"
+              onClick={() => setBalanceVisible(!balanceVisible)}
+            >
+              {balanceVisible ? (
+                <Eye className="w-4 h-4" />
+              ) : (
+                <EyeOff className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
+
+          <p className="text-xs text-muted-foreground mb-2">Total investido + Conta Multimoedas</p>
+          
+          <h3 className="text-4xl font-bold mb-6">
+            {balanceVisible ? formatCurrency(totalBRLA, 'BRL') : 'R$ ••••••'}
+          </h3>
+
+          <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="border-l-4 border-primary pl-3">
+              <p className="text-xs text-muted-foreground mb-1">Criptomoedas</p>
+              <p className="text-sm font-semibold">
+                {balanceVisible ? formatCurrency(totalBRLA, 'BRL') : 'R$0,00'}
+              </p>
+            </div>
+            <div className="pl-3">
+              <p className="text-xs text-muted-foreground mb-1">Renda Fácil</p>
+              <p className="text-sm font-semibold">
+                {balanceVisible ? 'R$0,00' : 'R$0,00'}
+              </p>
+            </div>
+            <div className="pl-3">
+              <p className="text-xs text-muted-foreground mb-1">Cestas cripto</p>
+              <p className="text-sm font-semibold">
+                {balanceVisible ? 'R$0,00' : 'R$0,00'}
+              </p>
+            </div>
+            <div className="pl-3">
+              <p className="text-xs text-muted-foreground mb-1">Conta multimoedas</p>
+              <p className="text-sm font-semibold">
+                {balanceVisible ? 'R$0,00' : 'R$0,00'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              className="flex-1 h-auto py-3 bg-accent hover:bg-accent/90"
               onClick={() => navigate('/deposit')}
             >
-              <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                <ArrowUpRight className="w-5 h-5" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold">Depositar</p>
-                <p className="text-xs opacity-90">Cripto ou PIX</p>
-              </div>
+              Depositar
             </Button>
             <Button
-              variant="outline"
-              className="h-auto py-4 justify-start gap-3"
-              onClick={() => navigate('/history')}
+              variant="secondary"
+              className="flex-1 h-auto py-3"
+              onClick={() => {/* TODO: implement withdraw */}}
             >
-              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-                <History className="w-5 h-5" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold">Histórico</p>
-                <p className="text-xs text-muted-foreground">Ver todas</p>
-              </div>
+              Retirar fundos
+            </Button>
+            <Button
+              variant="secondary"
+              className="h-auto py-3 px-4"
+              onClick={() => {/* TODO: implement buy */}}
+            >
+              Comprar
+            </Button>
+            <Button
+              variant="secondary"
+              className="h-auto py-3 px-4"
+              onClick={() => {/* TODO: implement convert */}}
+            >
+              Converter
             </Button>
           </div>
         </Card>
+
 
         {/* Recent Transactions */}
         <Card className="p-6 bg-gradient-card border-border/50">
@@ -99,7 +148,7 @@ export default function Dashboard() {
                 <TransactionItem
                   key={tx.id}
                   transaction={tx}
-                  onClick={() => navigate('/history')}
+                  onClick={() => handleTransactionClick(tx)}
                 />
               ))
             ) : (
@@ -116,6 +165,12 @@ export default function Dashboard() {
           </div>
         </Card>
       </div>
+
+      <TransactionDetailsModal
+        transaction={selectedTransaction}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+      />
     </div>
   );
 }

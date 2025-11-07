@@ -12,6 +12,9 @@ export function formatCrypto(value: number, symbol: string): string {
   if (symbol === 'ETH') {
     return `${value.toFixed(6)} ${symbol}`;
   }
+  if (symbol === 'BRLA') {
+    return `${value.toFixed(2)} ${symbol}`;
+  }
   return `${value.toFixed(2)} ${symbol}`;
 }
 
