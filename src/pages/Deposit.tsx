@@ -15,13 +15,13 @@ import { toast } from '@/hooks/use-toast';
 export default function Deposit() {
   const navigate = useNavigate();
   const [amountBRL, setAmountBRL] = useState(0);
-  const [selectedAsset, setSelectedAsset] = useState<AssetSymbol>('USDT');
+  const selectedAsset: AssetSymbol = 'BRLA'; // Fixed asset
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkType>('TRON');
   const [pixData, setPixData] = useState<PixPayload | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
   const fee = amountBRL > 0 ? Math.max(3.90, amountBRL * 0.015) : 0;
-  const estimatedAmount = amountBRL > 0 ? (amountBRL / conversionRates.USDT_BRL) : 0;
+  const estimatedAmount = amountBRL; // BRLA 1:1 with BRL
   const totalAmount = amountBRL + fee;
 
   const amountError = amountBRL > 0 && amountBRL < 1 
@@ -117,27 +117,16 @@ export default function Deposit() {
               />
             </Card>
 
-            {/* Asset Selection */}
+            {/* Network Selection */}
             <Card className="p-6 bg-gradient-card border-border/50">
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-3 block">Ativo a Creditar</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(['USDT', 'BTC', 'ETH'] as AssetSymbol[]).map((asset) => (
-                      <Button
-                        key={asset}
-                        variant={selectedAsset === asset ? 'default' : 'outline'}
-                        onClick={() => setSelectedAsset(asset)}
-                        className="h-12"
-                      >
-                        {asset}
-                      </Button>
-                    ))}
-                  </div>
+                  <label className="text-sm font-medium mb-3 block">Ativo: BRLA</label>
+                  <p className="text-xs text-muted-foreground mb-3">Brazilian Real Asset - Selecione a rede</p>
                 </div>
 
                 <NetworkSelector
-                  networks={selectedAsset === 'USDT' ? ['TRON', 'ERC20'] : selectedAsset === 'BTC' ? ['BTC'] : ['ERC20']}
+                  networks={['TRON', 'ERC20']}
                   selected={selectedNetwork}
                   onChange={setSelectedNetwork}
                 />
