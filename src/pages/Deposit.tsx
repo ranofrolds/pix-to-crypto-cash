@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { AmountInput } from '@/components/pix/AmountInput';
 import { ConversionHint } from '@/components/pix/ConversionHint';
 import { PixPaymentCard } from '@/components/pix/PixPaymentCard';
-import { NetworkSelector } from '@/components/wallet/NetworkSelector';
+import { NetworkBadge } from '@/components/ui/network-badge';
 import { PixPayload } from '@/lib/types/pix';
 import { NetworkType, AssetSymbol } from '@/lib/types/wallet';
 import { conversionRates } from '@/lib/mocks/fixtures';
@@ -133,11 +133,14 @@ export default function Deposit() {
                   </div>
                 </div>
 
-                <NetworkSelector
-                  networks={['BASE_SEPOLIA']}
-                  selected={selectedNetwork}
-                  onChange={setSelectedNetwork}
-                />
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Rede
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <NetworkBadge network="BASE_SEPOLIA" showFullName />
+                  </div>
+                </div>
               </div>
             </Card>
 
