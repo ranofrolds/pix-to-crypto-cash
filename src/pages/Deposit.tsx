@@ -15,7 +15,7 @@ import { toast } from '@/hooks/use-toast';
 export default function Deposit() {
   const navigate = useNavigate();
   const [amountBRL, setAmountBRL] = useState(0);
-  const selectedAsset: AssetSymbol = 'BRLA'; // Fixed asset
+  const [selectedAsset, setSelectedAsset] = useState<AssetSymbol>('BRLA');
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkType>('TRON');
   const [pixData, setPixData] = useState<PixPayload | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -117,12 +117,20 @@ export default function Deposit() {
               />
             </Card>
 
-            {/* Network Selection */}
+            {/* Asset Selection */}
             <Card className="p-6 bg-gradient-card border-border/50">
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-3 block">Ativo: BRLA</label>
-                  <p className="text-xs text-muted-foreground mb-3">Brazilian Real Asset - Selecione a rede</p>
+                  <label className="text-sm font-medium mb-3 block">Ativo a Creditar</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Button
+                      variant={selectedAsset === 'BRLA' ? 'default' : 'outline'}
+                      onClick={() => setSelectedAsset('BRLA')}
+                      className="h-12"
+                    >
+                      BRLA
+                    </Button>
+                  </div>
                 </div>
 
                 <NetworkSelector
