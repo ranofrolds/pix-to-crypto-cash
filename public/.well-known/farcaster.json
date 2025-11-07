@@ -1,4 +1,9 @@
 {
+  "accountAssociation": {
+    "header": "",
+    "payload": "",
+    "signature": ""
+  },
   "baseBuilder": {
     "ownerAddress": "0x3b0FB4aB496e960A98ba698B50926e9BdF6073bC"
   },
@@ -8,6 +13,8 @@
     "homeUrl": "https://pix-to-crypto-cash.vercel.app",
     "iconUrl": "https://pix-to-crypto-cash.vercel.app/og.png",
     "splashImageUrl": "https://pix-to-crypto-cash.vercel.app/og.png",
-    "splashBackgroundColor": "#000000"
+    "splashBackgroundColor": "#000000",
+    "primaryCategory": "finance",
+    "tags": ["pix", "crypto", "payments"]
   }
 }
