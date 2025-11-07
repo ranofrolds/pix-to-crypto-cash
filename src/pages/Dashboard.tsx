@@ -65,38 +65,11 @@ export default function Dashboard() {
             </Button>
           </div>
 
-          <p className="text-xs text-muted-foreground mb-2">Total investido + Conta Multimoedas</p>
+          <p className="text-xs text-muted-foreground mb-2">Total investido</p>
           
           <h3 className="text-4xl font-bold mb-6">
             {balanceVisible ? formatCurrency(totalBRLA, 'BRL') : 'R$ ••••••'}
           </h3>
-
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            <div className="border-l-4 border-primary pl-3">
-              <p className="text-xs text-muted-foreground mb-1">Criptomoedas</p>
-              <p className="text-sm font-semibold">
-                {balanceVisible ? formatCurrency(totalBRLA, 'BRL') : 'R$0,00'}
-              </p>
-            </div>
-            <div className="pl-3">
-              <p className="text-xs text-muted-foreground mb-1">Renda Fácil</p>
-              <p className="text-sm font-semibold">
-                {balanceVisible ? 'R$0,00' : 'R$0,00'}
-              </p>
-            </div>
-            <div className="pl-3">
-              <p className="text-xs text-muted-foreground mb-1">Cestas cripto</p>
-              <p className="text-sm font-semibold">
-                {balanceVisible ? 'R$0,00' : 'R$0,00'}
-              </p>
-            </div>
-            <div className="pl-3">
-              <p className="text-xs text-muted-foreground mb-1">Conta multimoedas</p>
-              <p className="text-sm font-semibold">
-                {balanceVisible ? 'R$0,00' : 'R$0,00'}
-              </p>
-            </div>
-          </div>
 
           <div className="flex gap-3">
             <Button
