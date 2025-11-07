@@ -33,6 +33,6 @@ export function getEnv(): AppEnv {
     ARBITRUM_RPC: rpc ?? "",
     CONTRACT_ADDRESS: contract,
     COINBASE_APP_ID: appId,
-    BACKEND_URL: backend ?? "http://localhost:3000",
+    BACKEND_URL: backend ?? "https://crypto-onramp-server.onrender.com",
   };
 }
