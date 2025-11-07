@@ -112,20 +112,6 @@ export default function Dashboard() {
             >
               Retirar fundos
             </Button>
-            <Button
-              variant="secondary"
-              className="h-auto py-3 px-4"
-              onClick={() => {/* TODO: implement buy */}}
-            >
-              Comprar
-            </Button>
-            <Button
-              variant="secondary"
-              className="h-auto py-3 px-4"
-              onClick={() => {/* TODO: implement convert */}}
-            >
-              Converter
-            </Button>
           </div>
         </Card>
 
