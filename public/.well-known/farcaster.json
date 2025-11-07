@@ -1,0 +1,32 @@
+{
+  "accountAssociation": {
+    "header": "",
+    "payload": "",
+    "signature": ""
+  },
+  "baseBuilder": {
+    "ownerAddress": "0x" 
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Pix to Crypto Cash",
+    "homeUrl": "https://pix-to-crypto-cash.vercel.app",
+    "iconUrl": "https://pix-to-crypto-cash.vercel.app/favicon.svg",
+    "splashImageUrl": "https://pix-to-crypto-cash.vercel.app/og.png",
+    "splashBackgroundColor": "#000000",
+    "webhookUrl": "",
+    "subtitle": "PIX to crypto, fast and secure",
+    "description": "Convert PIX deposits into crypto instantly.",
+    "screenshotUrls": [
+      "https://pix-to-crypto-cash.vercel.app/og.png"
+    ],
+    "primaryCategory": "finance",
+    "tags": ["pix", "crypto", "payments"],
+    "heroImageUrl": "https://pix-to-crypto-cash.vercel.app/og.png",
+    "tagline": "PIX in, crypto out",
+    "ogTitle": "Pix to Crypto Cash",
+    "ogDescription": "Deposit with PIX and receive crypto.",
+    "ogImageUrl": "https://pix-to-crypto-cash.vercel.app/og.png",
+    "noindex": true
+  }
+}
