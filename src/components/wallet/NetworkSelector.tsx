@@ -12,6 +12,7 @@ const networkLabels: Record<NetworkType, string> = {
   ERC20: 'Ethereum (ERC20)',
   BTC: 'Bitcoin',
   PIX: 'PIX',
+  BASE_SEPOLIA: 'Base (Sepolia)',
 };
 
 export function NetworkSelector({ networks, selected, onChange }: NetworkSelectorProps) {

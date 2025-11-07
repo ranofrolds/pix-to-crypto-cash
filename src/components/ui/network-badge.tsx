@@ -27,6 +27,11 @@ const networkConfig: Record<NetworkType, { color: string; label: string; fullLab
     label: 'PIX',
     fullLabel: 'PIX',
   },
+  BASE_SEPOLIA: {
+    color: 'border-primary text-primary bg-primary/10',
+    label: 'BASE',
+    fullLabel: 'Base (Sepolia)',
+  },
 };
 
 export function NetworkBadge({ network, showFullName = false }: NetworkBadgeProps) {

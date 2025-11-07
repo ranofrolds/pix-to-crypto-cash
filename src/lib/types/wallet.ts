@@ -1,5 +1,5 @@
 export type AssetSymbol = 'USDT' | 'BTC' | 'ETH' | 'BRL' | 'BRLA';
-export type NetworkType = 'TRON' | 'ERC20' | 'BTC' | 'PIX';
+export type NetworkType = 'TRON' | 'ERC20' | 'BTC' | 'PIX' | 'BASE_SEPOLIA';
 export type TransactionStatus = 'pending' | 'success' | 'failed';
 export type TransactionType = 'deposit' | 'withdrawal' | 'swap';
 

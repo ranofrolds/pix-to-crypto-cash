@@ -16,7 +16,7 @@ export default function Deposit() {
   const navigate = useNavigate();
   const [amountBRL, setAmountBRL] = useState(0);
   const [selectedAsset, setSelectedAsset] = useState<AssetSymbol | null>(null);
-  const [selectedNetwork, setSelectedNetwork] = useState<NetworkType>('TRON');
+  const [selectedNetwork, setSelectedNetwork] = useState<NetworkType>('BASE_SEPOLIA');
   const [pixData, setPixData] = useState<PixPayload | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -134,7 +134,7 @@ export default function Deposit() {
                 </div>
 
                 <NetworkSelector
-                  networks={['TRON', 'ERC20']}
+                  networks={['BASE_SEPOLIA']}
                   selected={selectedNetwork}
                   onChange={setSelectedNetwork}
                 />

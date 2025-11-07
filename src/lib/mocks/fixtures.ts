@@ -13,8 +13,8 @@ export const mockAssets: Asset[] = [
   {
     symbol: 'BRLA',
     name: 'Brazilian Real Asset',
-    network: 'TRON',
-    address: 'TXYZa8EuqRMZNfVEhHEuNJTjQw7ZPXQxvR',
+    network: 'BASE_SEPOLIA',
+    address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
     balance: 0.053669,
     balanceUSD: 30.00,
   },
@@ -62,9 +62,9 @@ export const mockTransactions: Transaction[] = [
     amountBRL: 30.00,
     amountUSD: 30.00,
     status: 'success',
-    network: 'TRON',
-    hash: 'polygon_hash_123',
-    address: 'TXYZa8EuqRMZNfVEhHEuNJTjQw7ZPXQxvR',
+    network: 'BASE_SEPOLIA',
+    hash: '0x1234567890abcdef',
+    address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
     createdAt: new Date('2025-01-06T22:06:00'),
     completedAt: new Date('2025-01-06T22:06:00'),
   },
@@ -77,7 +77,7 @@ export const mockTransactions: Transaction[] = [
     amountBRL: 50.00,
     amountUSD: 50.00,
     status: 'pending',
-    network: 'TRON',
+    network: 'BASE_SEPOLIA',
     createdAt: new Date(Date.now() - 1000 * 60 * 15), // 15 min ago
   },
   {
@@ -89,8 +89,8 @@ export const mockTransactions: Transaction[] = [
     amountBRL: 20.00,
     amountUSD: 20.00,
     status: 'success',
-    network: 'TRON',
-    hash: 'hash_456',
+    network: 'BASE_SEPOLIA',
+    hash: '0xabcdef1234567890',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2h ago
     completedAt: new Date(Date.now() - 1000 * 60 * 60 * 1.5),
   },
@@ -103,7 +103,7 @@ export const mockTransactions: Transaction[] = [
     amountBRL: 100.00,
     amountUSD: 100.00,
     status: 'failed',
-    network: 'TRON',
+    network: 'BASE_SEPOLIA',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
   },
   {
@@ -115,7 +115,7 @@ export const mockTransactions: Transaction[] = [
     amountBRL: 200.00,
     amountUSD: 200.00,
     status: 'success',
-    network: 'TRON',
+    network: 'BASE_SEPOLIA',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 72), // 3 days ago
     completedAt: new Date(Date.now() - 1000 * 60 * 60 * 71.5),
   },

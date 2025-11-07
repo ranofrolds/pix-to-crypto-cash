@@ -14,6 +14,7 @@ const explorerUrls: Record<NetworkType, string> = {
   ERC20: 'https://etherscan.io',
   BTC: 'https://blockchair.com/bitcoin',
   PIX: '#',
+  BASE_SEPOLIA: 'https://sepolia.basescan.org',
 };
 
 export function ExplorerLink({ hash, network, type = 'tx', children }: ExplorerLinkProps) {
