@@ -12,13 +12,15 @@ import { NetworkType, AssetSymbol } from '@/lib/types/wallet';
 import { toast } from '@/hooks/use-toast';
 import { useAccount } from 'wagmi';
 import { postPixWebhook } from '@/lib/api';
+import { targetChain } from '@/lib/wagmi';
 
 export default function Deposit() {
   const navigate = useNavigate();
   const { address, isConnected } = useAccount();
   const [amountBRL, setAmountBRL] = useState(0);
   const [selectedAsset, setSelectedAsset] = useState<AssetSymbol | null>(null);
-  const [selectedNetwork, setSelectedNetwork] = useState<NetworkType>('BASE_SEPOLIA');
+  const envNetwork: NetworkType = targetChain.id === 42161 ? 'ARBITRUM_ONE' : 'ARBITRUM_SEPOLIA';
+  const [selectedNetwork] = useState<NetworkType>(envNetwork);
   const [pixData, setPixData] = useState<PixPayload | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSubmittingWebhook, setIsSubmittingWebhook] = useState(false);
@@ -95,6 +97,11 @@ export default function Deposit() {
             <Button variant="ghost" size="icon" onClick={() => navigate(pixData ? '#' : '/')} disabled={!!pixData}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
+            {!isConnected && (
+              <p className="text-center text-sm text-muted-foreground mt-2">
+                Conecte sua carteira para gerar o PIX
+              </p>
+            )}
             <div>
               <h1 className="text-xl font-bold">Depositar via PIX</h1>
               <p className="text-sm text-muted-foreground">{pixData ? 'Complete o pagamento' : 'Configure seu depósito'}</p>
@@ -124,7 +131,7 @@ export default function Deposit() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Rede</label>
                   <div className="flex items-center gap-2">
-                    <NetworkBadge network="BASE_SEPOLIA" showFullName />
+                    <NetworkBadge network={selectedNetwork} showFullName />
                   </div>
                 </div>
               </div>
@@ -134,7 +141,7 @@ export default function Deposit() {
               <ConversionHint amountBRL={amountBRL} asset={selectedAsset} estimatedAmount={estimatedAmount} fee={fee} isLoading={isGenerating} />
             )}
 
-            <Button className="w-full h-14 text-lg shadow-glow gap-2" onClick={handleGeneratePix} disabled={!canGenerate || isGenerating}>
+            <Button className="w-full h-14 text-lg shadow-glow gap-2" onClick={handleGeneratePix} disabled={!isConnected || !canGenerate || isGenerating}>
               {isGenerating ? (
                 <>
                   <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
@@ -148,7 +155,7 @@ export default function Deposit() {
               )}
             </Button>
 
-            {!canGenerate && (amountBRL === 0 || !selectedAsset) && (
+            {!canGenerate && isConnected && (amountBRL === 0 || !selectedAsset) && (
               <p className="text-center text-sm text-muted-foreground">
                 {!selectedAsset ? 'Selecione o ativo BRLA para continuar' : 'Informe um valor válido para gerar o PIX'}
               </p>
@@ -168,4 +175,3 @@ export default function Deposit() {
     </div>
   );
 }
-

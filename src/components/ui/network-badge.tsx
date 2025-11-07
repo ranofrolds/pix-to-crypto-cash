@@ -32,6 +32,16 @@ const networkConfig: Record<NetworkType, { color: string; label: string; fullLab
     label: 'BASE',
     fullLabel: 'Base (Sepolia)',
   },
+  ARBITRUM_SEPOLIA: {
+    color: 'border-primary text-primary bg-primary/10',
+    label: 'ARB',
+    fullLabel: 'Arbitrum (Sepolia)',
+  },
+  ARBITRUM_ONE: {
+    color: 'border-primary text-primary bg-primary/10',
+    label: 'ARB',
+    fullLabel: 'Arbitrum One',
+  },
 };
 
 export function NetworkBadge({ network, showFullName = false }: NetworkBadgeProps) {
