@@ -11,10 +11,9 @@
     "version": "1",
     "name": "Pix to Crypto Cash",
     "homeUrl": "https://pix-to-crypto-cash.vercel.app",
-    "iconUrl": "https://pix-to-crypto-cash.vercel.app/favicon.svg",
+    "iconUrl": "https://pix-to-crypto-cash.vercel.app/og.png",
     "splashImageUrl": "https://pix-to-crypto-cash.vercel.app/og.png",
     "splashBackgroundColor": "#000000",
-    "webhookUrl": "",
     "subtitle": "PIX to crypto, fast and secure",
     "description": "Convert PIX deposits into crypto instantly.",
     "screenshotUrls": [
