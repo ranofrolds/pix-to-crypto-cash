@@ -47,7 +47,7 @@ export function WalletConnectButton({ onConnect, variant = 'default' }: WalletCo
         toast.error('Coinbase indisponível');
         return;
       }
-      await connect({ connector: coinbaseConnector });
+      await connect({ connector: coinbaseConnector, chainId: targetChain.id, instantOnboarding: true });
       onConnect?.();
       setIsDialogOpen(false);
     } catch (err: any) {
@@ -78,7 +78,7 @@ export function WalletConnectButton({ onConnect, variant = 'default' }: WalletCo
       <>
         <Button onClick={() => setIsDialogOpen(true)} variant={variant} className="gap-2">
           <WalletIcon className="w-4 h-4" />
-          Entrar com Google/Apple (Coinbase)
+          Entrar com Coinbase (Passkey/Google/Apple)
         </Button>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -132,4 +132,3 @@ export function WalletConnectButton({ onConnect, variant = 'default' }: WalletCo
     </div>
   );
 }
-

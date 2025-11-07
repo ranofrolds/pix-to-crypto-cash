@@ -35,7 +35,8 @@ export const wagmiConfig = createConfig({
   connectors: [
     coinbaseWallet({
       version: "4",
-      preference: { options: "smartWalletOnly" },
+      // Show all onboarding options (Passkey + Social)
+      preference: "all",
       appName: "Pix to Crypto Cash",
       appLogoUrl: "/icon.png",
       // Optional: target chain id for initial provider
