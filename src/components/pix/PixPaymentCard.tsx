@@ -17,9 +17,11 @@ interface PixPaymentCardProps {
   onCancel: () => void;
   onMarkAsPaid: () => void;
   onExpire?: () => void;
+  confirmLabel?: string;
+  confirmLoading?: boolean;
 }
 
-export function PixPaymentCard({ pixData, onCancel, onMarkAsPaid, onExpire }: PixPaymentCardProps) {
+export function PixPaymentCard({ pixData, onCancel, onMarkAsPaid, onExpire, confirmLabel, confirmLoading }: PixPaymentCardProps) {
   const handleCopyTxid = async () => {
     try {
       await copyToClipboard(pixData.txid);
@@ -140,8 +142,9 @@ export function PixPaymentCard({ pixData, onCancel, onMarkAsPaid, onExpire }: Pi
         <Button
           className="flex-1 shadow-glow"
           onClick={onMarkAsPaid}
+          disabled={!!confirmLoading}
         >
-          Marcar como Pago (Simulado)
+          {confirmLoading ? 'Enviando...' : (confirmLabel ?? 'Já paguei')}
         </Button>
       </div>
 

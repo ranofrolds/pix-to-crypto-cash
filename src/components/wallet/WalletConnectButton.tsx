@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ChevronDown, Wallet as WalletIcon } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Wallet as WalletIcon, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -14,46 +14,71 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { NetworkBadge } from '@/components/ui/network-badge';
-import { NetworkType } from '@/lib/types/wallet';
+import { useAccount, useChainId, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
+import { targetChain } from '@/lib/wagmi';
+import { toast } from 'sonner';
 
 interface WalletConnectButtonProps {
   onConnect?: () => void;
   variant?: 'default' | 'outline';
 }
 
+function truncateAddress(addr?: string) {
+  if (!addr) return '';
+  return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+}
+
 export function WalletConnectButton({ onConnect, variant = 'default' }: WalletConnectButtonProps) {
-  const [isConnected, setIsConnected] = useState(false);
-  const [selectedNetwork, setSelectedNetwork] = useState<NetworkType>('TRON');
+  const { connect, connectors, isPending, error: connectError } = useConnect();
+  const { disconnect } = useDisconnect();
+  const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleWalletSelect = (walletType: string) => {
-    setIsConnected(true);
-    setIsDialogOpen(false);
-    onConnect?.();
+  const coinbaseConnector = useMemo(
+    () => connectors.find((c) => c.id === 'coinbaseWalletSDK'),
+    [connectors]
+  );
+
+  const handleLogin = async () => {
+    try {
+      if (!coinbaseConnector) {
+        toast.error('Coinbase indisponível');
+        return;
+      }
+      await connect({ connector: coinbaseConnector });
+      onConnect?.();
+      setIsDialogOpen(false);
+    } catch (err: any) {
+      const message = String(err?.message || '');
+      if (/rejected|denied|closed|cancel/i.test(message)) {
+        toast.message('Login cancelado', { description: 'Tentar novamente' });
+      } else {
+        toast.error('Falha ao conectar', { description: 'RPC indisponível, tente mais tarde' });
+      }
+    }
   };
 
-  const handleDisconnect = () => {
-    setIsConnected(false);
+  const handleSwitch = async () => {
+    try {
+      await switchChainAsync({ chainId: targetChain.id });
+    } catch (err: any) {
+      const message = String(err?.message || '');
+      if (/rejected|denied/i.test(message)) {
+        toast.message('Troca de rede cancelada');
+      } else {
+        toast.error('Não foi possível trocar a rede');
+      }
+    }
   };
-
-  const networks: NetworkType[] = ['TRON', 'ERC20', 'BTC'];
-
-  const walletProviders = [
-    {
-      id: 'coinbase',
-      name: 'Coinbase Smart Wallet',
-      description: 'Login social com Google, Apple ou Email',
-      icon: '🔷',
-    },
-  ];
 
   if (!isConnected) {
     return (
       <>
         <Button onClick={() => setIsDialogOpen(true)} variant={variant} className="gap-2">
           <WalletIcon className="w-4 h-4" />
-          Conectar Wallet
+          Entrar com Google/Apple (Coinbase)
         </Button>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -61,28 +86,19 @@ export function WalletConnectButton({ onConnect, variant = 'default' }: WalletCo
             <DialogHeader>
               <DialogTitle>Conectar Wallet</DialogTitle>
               <DialogDescription>
-                Escolha um provedor para conectar sua carteira
+                Login social via Coinbase (Google, Apple ou Email)
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-3 py-4">
-              {walletProviders.map((provider) => (
-                <button
-                  key={provider.id}
-                  onClick={() => handleWalletSelect(provider.id)}
-                  className="flex items-center gap-4 p-4 rounded-lg border border-border bg-secondary/50 hover:bg-secondary hover:border-primary/50 transition-all group"
-                >
-                  <div className="text-3xl">{provider.icon}</div>
-                  <div className="flex-1 text-left">
-                    <div className="font-medium text-foreground group-hover:text-primary transition-colors">
-                      {provider.name}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {provider.description}
-                    </div>
-                  </div>
-                  <ChevronDown className="w-4 h-4 -rotate-90 text-muted-foreground group-hover:text-primary transition-colors" />
-                </button>
-              ))}
+              <Button onClick={handleLogin} disabled={isPending} className="h-11">
+                {isPending ? 'Conectando...' : 'Continuar com Coinbase'}
+              </Button>
+              {connectError && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <span>Não foi possível iniciar o login.</span>
+                </div>
+              )}
             </div>
           </DialogContent>
         </Dialog>
@@ -90,23 +106,25 @@ export function WalletConnectButton({ onConnect, variant = 'default' }: WalletCo
     );
   }
 
+  const wrongNetwork = chainId !== targetChain.id;
+
   return (
     <div className="flex items-center gap-2">
-      {/* Network Badge - Fixed */}
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-secondary/50">
-        <NetworkBadge network="BASE_SEPOLIA" showFullName />
-      </div>
+      {wrongNetwork ? (
+        <Button variant="destructive" size="sm" onClick={handleSwitch} disabled={isSwitching}>
+          {isSwitching ? 'Trocando...' : 'Trocar para Arbitrum'}
+        </Button>
+      ) : null}
 
-      {/* Wallet Address */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="gap-2 h-9 font-mono">
             <WalletIcon className="w-3.5 h-3.5" />
-            <span className="text-xs">0x742d...f44e</span>
+            <span className="text-xs">{truncateAddress(address)}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleDisconnect} className="text-destructive">
+          <DropdownMenuItem onClick={() => disconnect()} className="text-destructive">
             Desconectar
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -114,3 +132,4 @@ export function WalletConnectButton({ onConnect, variant = 'default' }: WalletCo
     </div>
   );
 }
+

@@ -71,3 +71,24 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## Coinbase Embedded Wallets (address only)
+
+Configure these environment variables (Vercel → Project → Settings → Environment Variables):
+
+- `VITE_ARBITRUM_CHAIN_ID` → `421614` (Sepolia) or `42161` (One)
+- `VITE_ARBITRUM_RPC` → Your stable Arbitrum RPC URL
+- `VITE_CONTRACT_ADDRESS` → 0x... (reserved for future on-chain use)
+- `VITE_COINBASE_APP_ID` → App ID from CDP (optional for future use)
+
+Client flow implemented:
+
+- Button “Entrar com Google/Apple (Coinbase)” opens Coinbase Smart Wallet login
+- On success, shows the connected address and basic disconnect
+- If chainId ≠ Arbitrum (from `VITE_ARBITRUM_CHAIN_ID`), shows “Trocar para Arbitrum”
+- Error states: cancel login, RPC indisponível, provider indisponível
+
+Notes:
+
+- Providers (Google/Apple/Email) and Redirect URL are enabled in the CDP Portal dashboard.
+- This repo uses wagmi + Coinbase Wallet SDK v4 in smart wallet mode.
