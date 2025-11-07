@@ -41,28 +41,10 @@ export function WalletConnectButton({ onConnect, variant = 'default' }: WalletCo
 
   const walletProviders = [
     {
-      id: 'metamask',
-      name: 'MetaMask',
-      description: 'Conectar com MetaMask',
-      icon: '🦊',
-    },
-    {
-      id: 'walletconnect',
-      name: 'WalletConnect',
-      description: 'Escanear com WalletConnect',
-      icon: '📱',
-    },
-    {
       id: 'coinbase',
-      name: 'Coinbase Wallet',
-      description: 'Conectar com Coinbase',
+      name: 'Coinbase Smart Wallet',
+      description: 'Login social com Google, Apple ou Email',
       icon: '🔷',
-    },
-    {
-      id: 'tronlink',
-      name: 'TronLink',
-      description: 'Conectar com TronLink',
-      icon: '🔴',
     },
   ];
 
