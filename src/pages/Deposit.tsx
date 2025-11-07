@@ -15,7 +15,7 @@ import { toast } from '@/hooks/use-toast';
 export default function Deposit() {
   const navigate = useNavigate();
   const [amountBRL, setAmountBRL] = useState(0);
-  const [selectedAsset, setSelectedAsset] = useState<AssetSymbol>('BRLA');
+  const [selectedAsset, setSelectedAsset] = useState<AssetSymbol | null>(null);
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkType>('TRON');
   const [pixData, setPixData] = useState<PixPayload | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -30,7 +30,7 @@ export default function Deposit() {
     ? 'Valor máximo é R$ 50.000,00'
     : '';
 
-  const canGenerate = amountBRL >= 1 && amountBRL <= 50000 && !pixData;
+  const canGenerate = amountBRL >= 1 && amountBRL <= 50000 && !pixData && selectedAsset !== null;
 
   const handleGeneratePix = () => {
     setIsGenerating(true);
@@ -171,9 +171,9 @@ export default function Deposit() {
               )}
             </Button>
 
-            {!canGenerate && amountBRL === 0 && (
+            {!canGenerate && (amountBRL === 0 || !selectedAsset) && (
               <p className="text-center text-sm text-muted-foreground">
-                Informe um valor válido para gerar o PIX
+                {!selectedAsset ? 'Selecione o ativo BRLA para continuar' : 'Informe um valor válido para gerar o PIX'}
               </p>
             )}
           </>
