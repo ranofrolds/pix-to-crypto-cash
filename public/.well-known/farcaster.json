@@ -5,16 +5,30 @@
     "signature": ""
   },
   "baseBuilder": {
-    "ownerAddress": "0x3b0FB4aB496e960A98ba698B50926e9BdF6073bC"
+    "ownerAddress": "0x"
   },
   "miniapp": {
     "version": "1",
-    "name": "Pix to Crypto Cash",
-    "homeUrl": "https://pix-to-crypto-cash.vercel.app",
-    "iconUrl": "https://pix-to-crypto-cash.vercel.app/og.png",
-    "splashImageUrl": "https://pix-to-crypto-cash.vercel.app/og.png",
+    "name": "Example Mini App",
+    "homeUrl": "https://ex.co",
+    "iconUrl": "https://ex.co/i.png",
+    "splashImageUrl": "https://ex.co/l.png",
     "splashBackgroundColor": "#000000",
-    "primaryCategory": "finance",
-    "tags": ["pix", "crypto", "payments"]
+    "webhookUrl": "https://ex.co/api/webhook",
+    "subtitle": "Fast, fun, social",
+    "description": "A fast, fun way to challenge friends in real time.",
+    "screenshotUrls": [
+      "https://ex.co/s1.png",
+      "https://ex.co/s2.png",
+      "https://ex.co/s3.png"
+    ],
+    "primaryCategory": "social",
+    "tags": ["example", "miniapp", "baseapp"],
+    "heroImageUrl": "https://ex.co/og.png",
+    "tagline": "Play instantly",
+    "ogTitle": "Example Mini App",
+    "ogDescription": "Challenge friends in real time.",
+    "ogImageUrl": "https://ex.co/og.png",
+    "noindex": true
   }
 }
