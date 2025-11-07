@@ -92,26 +92,10 @@ export function WalletConnectButton({ onConnect, variant = 'default' }: WalletCo
 
   return (
     <div className="flex items-center gap-2">
-      {/* Network Selector */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-2 h-9">
-            <NetworkBadge network={selectedNetwork} />
-            <ChevronDown className="w-3.5 h-3.5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {networks.map((network) => (
-            <DropdownMenuItem
-              key={network}
-              onClick={() => setSelectedNetwork(network)}
-              className="gap-2"
-            >
-              <NetworkBadge network={network} showFullName />
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {/* Network Badge - Fixed */}
+      <div className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-secondary/50">
+        <NetworkBadge network="BASE_SEPOLIA" showFullName />
+      </div>
 
       {/* Wallet Address */}
       <DropdownMenu>
