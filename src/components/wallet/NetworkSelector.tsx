@@ -13,7 +13,7 @@ const networkLabels: Record<NetworkType, string> = {
   BTC: 'Bitcoin',
   PIX: 'PIX',
   BASE_SEPOLIA: 'Base (Sepolia)',
-  ARBITRUM_SEPOLIA: 'Arbitrum (Sepolia)',
+  ARBITRUM_SEPOLIA: 'Base Sepolia',
   ARBITRUM_ONE: 'Arbitrum One',
 };
 

@@ -31,6 +31,7 @@ export function transformBackendTransaction(tx: BackendTransaction): Transaction
     network: 'ARBITRUM_SEPOLIA',
     hash: tx.hash,
     address: tx.to,
+    explorerUrl: tx.url,
     createdAt,
     completedAt: tx.confirmations > 0 ? createdAt : undefined,
   };

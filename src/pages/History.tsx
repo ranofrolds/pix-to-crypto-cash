@@ -53,53 +53,22 @@ export default function History() {
             </div>
           </div>
         </div>
-      </header>
+      </header> 
 
-      <div className="container max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Filters */}
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Filter className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Filtrar por status</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {(['all', 'pending', 'success', 'failed'] as const).map((status) => (
-              <Badge
-                key={status}
-                variant={statusFilter === status ? 'default' : 'outline'}
-                className="cursor-pointer px-3 py-1.5"
-                onClick={() => setStatusFilter(status)}
-              >
-                {status === 'all' ? 'Todas' : status === 'pending' ? 'Pendente' : status === 'success' ? 'Concluído' : 'Falhou'}
-                <span className="ml-1.5 opacity-70">({statusCounts[status]})</span>
-              </Badge>
-            ))}
-          </div>
-        </Card>
-
+      <div className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
         {/* Transactions List */}
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">
-            Transações {statusFilter !== 'all' && `(${filteredTransactions.length})`}
-          </h2>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-            </div>
+        <Card className="p-6 bg-gradient-card border-border/50">
+          <h2 className="text-lg font-semibold mb-4">Transações</h2>
+          {filteredTransactions.length > 0 ? (
+            filteredTransactions.map((tx) => (
+              <TransactionItem key={tx.id} transaction={tx} className="mb-2" />
+            ))
           ) : (
-            <div className="space-y-2">
-              {filteredTransactions.length > 0 ? (
-                filteredTransactions.map((tx) => (
-                  <TransactionItem key={tx.id} transaction={tx} />
-                ))
-              ) : (
-                <EmptyState
-                  icon={HistoryIcon}
-                  title="Nenhuma transação encontrada"
-                  description={!address ? "Conecte sua carteira para ver suas transações" : "Não há transações com este filtro"}
-                />
-              )}
-            </div>
+            <EmptyState
+              icon={HistoryIcon}
+              title="Nenhuma transação encontrada"
+              description={!address ? "Conecte sua carteira para ver suas transações" : "Não há transações com este filtro"}
+            />
           )}
         </Card>
       </div>

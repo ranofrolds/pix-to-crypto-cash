@@ -1,30 +1,14 @@
 import { ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NetworkType } from '@/lib/types/wallet';
 
 interface ExplorerLinkProps {
-  hash: string;
-  network: NetworkType;
-  type?: 'tx' | 'address';
+  url?: string;
   children?: React.ReactNode;
 }
 
-const explorerUrls: Record<NetworkType, string> = {
-  TRON: 'https://tronscan.org/#',
-  ERC20: 'https://etherscan.io',
-  BTC: 'https://blockchair.com/bitcoin',
-  PIX: '#',
-  BASE_SEPOLIA: 'https://sepolia.basescan.org',
-  ARBITRUM_SEPOLIA: 'https://sepolia.arbiscan.io',
-  ARBITRUM_ONE: 'https://arbiscan.io',
-};
-
-export function ExplorerLink({ hash, network, type = 'tx', children }: ExplorerLinkProps) {
-  const baseUrl = explorerUrls[network];
-  const path = type === 'tx' ? 'transaction' : 'address';
-  const url = network === 'PIX' ? '#' : `${baseUrl}/${path}/${hash}`;
-
-  if (network === 'PIX') return null;
+export function ExplorerLink({ url, children }: ExplorerLinkProps) {
+  // If no URL provided, don't render anything
+  if (!url || url === '#') return null;
 
   return (
     <Button

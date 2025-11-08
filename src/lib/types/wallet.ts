@@ -32,6 +32,7 @@ export interface Transaction {
   network?: NetworkType;
   hash?: string;
   address?: string;
+  explorerUrl?: string;
   createdAt: Date;
   completedAt?: Date;
   fee?: number;
