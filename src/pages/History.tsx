@@ -6,23 +6,32 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TransactionItem } from '@/components/wallet/TransactionItem';
 import { EmptyState } from '@/components/ui/empty-state';
-import { mockTransactions } from '@/lib/mocks/fixtures';
-import { TransactionStatus } from '@/lib/types/wallet';
+import { TransactionStatus, Transaction } from '@/lib/types/wallet';
 import { History as HistoryIcon } from 'lucide-react';
+import { useAccount } from 'wagmi';
+import { useWalletTransactions } from '@/hooks/use-wallet-transactions';
+import { transformBackendTransactions } from '@/lib/utils/transform-transactions';
 
 export default function History() {
   const navigate = useNavigate();
+  const { address } = useAccount();
+  const { data: transactionsData, isLoading } = useWalletTransactions(address);
   const [statusFilter, setStatusFilter] = useState<TransactionStatus | 'all'>('all');
 
-  const filteredTransactions = mockTransactions.filter((tx) =>
+  // Transform backend transactions to UI format
+  const allTransactions: Transaction[] = transactionsData?.data?.transactions
+    ? transformBackendTransactions(transactionsData.data.transactions)
+    : [];
+
+  const filteredTransactions = allTransactions.filter((tx) =>
     statusFilter === 'all' ? true : tx.status === statusFilter
   );
 
   const statusCounts = {
-    all: mockTransactions.length,
-    pending: mockTransactions.filter((tx) => tx.status === 'pending').length,
-    success: mockTransactions.filter((tx) => tx.status === 'success').length,
-    failed: mockTransactions.filter((tx) => tx.status === 'failed').length,
+    all: allTransactions.length,
+    pending: allTransactions.filter((tx) => tx.status === 'pending').length,
+    success: allTransactions.filter((tx) => tx.status === 'success').length,
+    failed: allTransactions.filter((tx) => tx.status === 'failed').length,
   };
 
   return (
@@ -73,19 +82,25 @@ export default function History() {
           <h2 className="text-lg font-semibold mb-4">
             Transações {statusFilter !== 'all' && `(${filteredTransactions.length})`}
           </h2>
-          <div className="space-y-2">
-            {filteredTransactions.length > 0 ? (
-              filteredTransactions.map((tx) => (
-                <TransactionItem key={tx.id} transaction={tx} />
-              ))
-            ) : (
-              <EmptyState
-                icon={HistoryIcon}
-                title="Nenhuma transação encontrada"
-                description="Não há transações com este filtro"
-              />
-            )}
-          </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {filteredTransactions.length > 0 ? (
+                filteredTransactions.map((tx) => (
+                  <TransactionItem key={tx.id} transaction={tx} />
+                ))
+              ) : (
+                <EmptyState
+                  icon={HistoryIcon}
+                  title="Nenhuma transação encontrada"
+                  description={!address ? "Conecte sua carteira para ver suas transações" : "Não há transações com este filtro"}
+                />
+              )}
+            </div>
+          )}
         </Card>
       </div>
     </div>

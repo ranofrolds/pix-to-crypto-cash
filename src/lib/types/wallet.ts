@@ -44,3 +44,26 @@ export interface WalletBalance {
   ETH: number;
   BRLA: number;
 }
+
+// Backend transaction response types
+export interface BackendTransaction {
+  hash: string;
+  tipo: string;
+  url: string;
+  data: string;
+  hora: string;
+  valorFormatado: string;
+  valorRaw: string;
+  from: string;
+  to: string;
+  blockNumber: number;
+  confirmations: number;
+}
+
+export interface BackendTransactionsResponse {
+  success: boolean;
+  data: {
+    wallet: string;
+    transactions: BackendTransaction[];
+  };
+}
