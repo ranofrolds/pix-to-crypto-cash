@@ -107,14 +107,7 @@ export function PixPaymentCard({ pixData, onCancel, onMarkAsPaid, onExpire, conf
       {/* Actions */}
       <div className="flex gap-3">
         <Button
-          variant="outline"
-          className="flex-1"
-          onClick={onCancel}
-        >
-          Cancelar
-        </Button>
-        <Button
-          className="flex-1 shadow-glow"
+          className="flex-1 shadow-glow text-lg h-12 py-3 px-8"
           onClick={onMarkAsPaid}
           disabled={!!confirmLoading}
         >

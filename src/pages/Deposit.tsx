@@ -7,6 +7,7 @@ import { AmountInput } from '@/components/pix/AmountInput';
 import { ConversionHint } from '@/components/pix/ConversionHint';
 import { PixPaymentCard } from '@/components/pix/PixPaymentCard';
 import { NetworkBadge } from '@/components/ui/network-badge';
+import { FullBackdropLoading } from '@/components/ui/full-backdrop-loading';
 import { PixPayload } from '@/lib/types/pix';
 import { NetworkType, AssetSymbol } from '@/lib/types/wallet';
 import { toast } from '@/hooks/use-toast';
@@ -73,7 +74,7 @@ export default function Deposit() {
       setIsSubmittingWebhook(true);
       const amountStr = String(Math.floor(estimatedAmount));
       await postPixWebhook({ wallet_address: address, amount: amountStr });
-      toast({ title: 'Pagamento registrado', description: 'Estamos processando seu crédito on-chain' });
+      toast({ title: 'Pagamento registrado', description: 'Acabamos de processar seu crédito on-chain' });
       navigate('/history');
     } catch (e: any) {
       const msg = String(e?.message || '');
@@ -91,6 +92,12 @@ export default function Deposit() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Full Backdrop Loading */}
+      <FullBackdropLoading
+        isOpen={isGenerating || isSubmittingWebhook}
+        message={isGenerating ? 'Gerando Pix...' : 'Confirmando pagamento...'}
+      />
+
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-lg sticky top-0 z-10">
         <div className="container max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center gap-3">
@@ -103,8 +110,7 @@ export default function Deposit() {
               </p>
             )}
             <div>
-              <h1 className="text-xl font-bold">Depositar via PIX</h1>
-              <p className="text-sm text-muted-foreground">{pixData ? 'Complete o pagamento' : 'Configure seu depósito'}</p>
+              <h1 className="text-xl font-bold">Depositar via Pix</h1>
             </div>
           </div>
         </div>
@@ -115,6 +121,11 @@ export default function Deposit() {
           <>
             <Card className="p-6 bg-gradient-card border-border/50">
               <AmountInput value={amountBRL} onChange={setAmountBRL} error={amountError} min={1} max={5000} />
+              {!canGenerate && isConnected && (amountBRL === 0 || !selectedAsset) && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  {!selectedAsset ? 'Selecione o ativo BRLA para continuar.' : 'Informe um valor válido para gerar o Pix.'}
+                </p>
+              )}
             </Card>
 
             <Card className="p-6 bg-gradient-card border-border/50">
@@ -154,12 +165,6 @@ export default function Deposit() {
                 </>
               )}
             </Button>
-
-            {!canGenerate && isConnected && (amountBRL === 0 || !selectedAsset) && (
-              <p className="text-center text-sm text-muted-foreground">
-                {!selectedAsset ? 'Selecione o ativo BRLA para continuar' : 'Informe um valor válido para gerar o PIX'}
-              </p>
-            )}
           </>
         ) : (
           <PixPaymentCard
