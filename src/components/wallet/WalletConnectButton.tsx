@@ -17,6 +17,7 @@ import {
 import { useAccount, useChainId, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
 import { targetChain } from '@/lib/wagmi';
 import { toast } from 'sonner';
+import { ConnectWallet } from '@coinbase/onchainkit/wallet';
 
 interface WalletConnectButtonProps {
   onConnect?: () => void;
@@ -75,34 +76,15 @@ export function WalletConnectButton({ onConnect, variant = 'default' }: WalletCo
 
   if (!isConnected) {
     return (
-      <>
-        <Button onClick={() => setIsDialogOpen(true)} variant={variant} className="gap-2">
-          <WalletIcon className="w-4 h-4" />
-          Entrar com Coinbase (Passkey/Google/Apple)
-        </Button>
-
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="sm:max-w-md bg-card border-border">
-            <DialogHeader>
-              <DialogTitle>Conectar Wallet</DialogTitle>
-              <DialogDescription>
-                Login social via Coinbase (Google, Apple ou Email)
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-3 py-4">
-              <Button onClick={handleLogin} disabled={isPending} className="h-11">
-                {isPending ? 'Conectando...' : 'Continuar com Coinbase'}
-              </Button>
-              {connectError && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <AlertTriangle className="w-3.5 h-3.5" />
-                  <span>Não foi possível iniciar o login.</span>
-                </div>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-      </>
+      <ConnectWallet
+        disconnectedLabel={
+          <span className="inline-flex items-center gap-2">
+            <WalletIcon className="w-4 h-4" /> Entrar com Coinbase (Google/Apple/Passkey)
+          </span>
+        }
+        className="px-3 py-2 rounded-md border border-border bg-secondary/50 hover:bg-secondary transition-colors"
+        onConnect={onConnect}
+      />
     );
   }
 
