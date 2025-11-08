@@ -7,10 +7,10 @@ interface QrCanvasProps {
   size?: number;
 }
 
-export function QrCanvas({ data, size = 240 }: QrCanvasProps) {
+export function QrCanvas({ data, size = 180 }: QrCanvasProps) {
   return (
     <div className="space-y-4">
-      <Card className="p-8 bg-white flex items-center justify-center">
+      <Card className="p-8 bg-transparent flex items-center justify-center">
         <div
           className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl flex items-center justify-center border-4 border-primary/20"
           style={{ width: size, height: size }}

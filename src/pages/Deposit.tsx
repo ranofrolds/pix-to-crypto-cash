@@ -7,6 +7,7 @@ import { AmountInput } from '@/components/pix/AmountInput';
 import { ConversionHint } from '@/components/pix/ConversionHint';
 import { PixPaymentCard } from '@/components/pix/PixPaymentCard';
 import { NetworkBadge } from '@/components/ui/network-badge';
+import { FullBackdropLoading } from '@/components/ui/full-backdrop-loading';
 import { PixPayload } from '@/lib/types/pix';
 import { NetworkType, AssetSymbol } from '@/lib/types/wallet';
 import { toast } from '@/hooks/use-toast';
@@ -73,7 +74,7 @@ export default function Deposit() {
       setIsSubmittingWebhook(true);
       const amountStr = String(Math.floor(estimatedAmount));
       await postPixWebhook({ wallet_address: address, amount: amountStr });
-      toast({ title: 'Pagamento registrado', description: 'Estamos processando seu crédito on-chain' });
+      toast({ title: 'Pagamento registrado', description: 'Acabamos de processar seu crédito on-chain' });
       navigate('/history');
     } catch (e: any) {
       const msg = String(e?.message || '');
@@ -91,6 +92,12 @@ export default function Deposit() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Full Backdrop Loading */}
+      <FullBackdropLoading
+        isOpen={isGenerating || isSubmittingWebhook}
+        message={isGenerating ? 'Gerando Pix...' : 'Confirmando pagamento...'}
+      />
+
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-lg sticky top-0 z-10">
         <div className="container max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center gap-3">
