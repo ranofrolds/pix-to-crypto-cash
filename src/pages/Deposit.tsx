@@ -40,6 +40,7 @@ export default function Deposit() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [initialBalance, setInitialBalance] = useState(0);
   const [enablePolling, setEnablePolling] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const [calculatedFee, setCalculatedFee] = useState(0);
   const fee = calculatedFee > 0 ? calculatedFee : (amountBRL > 0 ? Math.max(0.85, amountBRL * 0.015) : 0);
@@ -130,6 +131,7 @@ export default function Deposit() {
     setPixData(null);
     setEnablePolling(false);
     stopPolling();
+    setIsProcessingPayment(false);
   };
 
   const handleMarkAsPaid = () => {
@@ -144,6 +146,7 @@ export default function Deposit() {
     if (!pixData) return;
 
     // Inicia long polling
+    setIsProcessingPayment(true);
     setEnablePolling(true);
     toast({
       title: 'Aguardando pagamento',
@@ -157,6 +160,8 @@ export default function Deposit() {
   // Effect: Listen to balance changes from polling
   useEffect(() => {
     if (balanceChanged && newBalance > initialBalance && address) {
+      setEnablePolling(false);
+      setIsProcessingPayment(true);
       const credited = newBalance - initialBalance;
 
       // Fetch latest transaction
@@ -216,6 +221,9 @@ export default function Deposit() {
   // Effect: Handle polling timeout
   useEffect(() => {
     if (timeoutReached && isPolling === false && enablePolling) {
+      setEnablePolling(false);
+      stopPolling();
+      setIsProcessingPayment(true);
       toast({
         title: 'Tempo esgotado',
         description: 'Pagamento ainda não confirmado. Verifique seu saldo no Dashboard.',
@@ -227,14 +235,18 @@ export default function Deposit() {
         navigate('/dashboard');
       }, 2000);
     }
-  }, [timeoutReached, isPolling, enablePolling, navigate]);
+  }, [timeoutReached, isPolling, enablePolling, navigate, stopPolling]);
 
   return (
     <div className="min-h-screen bg-background">
       {/* Full Backdrop Loading */}
       <FullBackdropLoading
-        isOpen={isGenerating || isPolling}
-        message={isGenerating ? 'Gerando Pix...' : 'Aguardando confirmação do pagamento...'}
+        isOpen={isGenerating || isProcessingPayment}
+        message={
+          isGenerating
+            ? 'Gerando Pix...'
+            : 'Aguardando confirmação do pagamento...'
+        }
       />
 
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-lg sticky top-0 z-10">
@@ -273,7 +285,7 @@ export default function Deposit() {
                   <label className="text-sm font-medium mb-3 block">Ativo a Creditar</label>
                   <div className="grid grid-cols-3 gap-2">
                     <Button variant={selectedAsset === 'BRLA' ? 'default' : 'outline'} onClick={() => setSelectedAsset('BRLA')} className="h-12" disabled>
-                      BRLA
+                      BRLR
                     </Button>
                   </div>
                 </div>
@@ -312,7 +324,7 @@ export default function Deposit() {
             onMarkAsPaid={handleMarkAsPaid}
             onExpire={handleExpire}
             confirmLabel="Já paguei"
-            confirmLoading={isPolling}
+            confirmLoading={isProcessingPayment}
           />
         )}
       </div>

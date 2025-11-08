@@ -13,7 +13,7 @@ export function formatCrypto(value: number, symbol: string): string {
     return `${value.toFixed(6)} ${symbol}`;
   }
   if (symbol === 'BRLA') {
-    return `${value.toFixed(2)} ${symbol}`;
+    return `${value.toFixed(2)} BRLR`;
   }
   return `${value.toFixed(2)} ${symbol}`;
 }
