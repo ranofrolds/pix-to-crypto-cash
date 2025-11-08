@@ -79,7 +79,7 @@ export function WalletConnectButton({ onConnect, variant = 'default' }: WalletCo
       <ConnectWallet
         disconnectedLabel={
           <span className="inline-flex items-center gap-2">
-            <WalletIcon className="w-4 h-4" /> Entrar com Coinbase (Google/Apple/Passkey)
+            <WalletIcon className="w-4 h-4" /> Entrar com Coinbase
           </span>
         }
         className="px-3 py-2 rounded-md border border-border bg-secondary/50 hover:bg-secondary transition-colors"

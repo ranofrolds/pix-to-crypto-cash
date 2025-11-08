@@ -18,6 +18,12 @@ export default {
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
+        // Refuconnect Brand Colors
+        'crimson-black': '#0B0119',
+        'abyss-purple': '#170420',
+        'crimson-red': '#C8283C',
+        'warm-coral': '#FF785A',
+        'soft-peach': '#FFC8B4',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
