@@ -34,12 +34,12 @@ const networkConfig: Record<NetworkType, { color: string; label: string; fullLab
   },
   ARBITRUM_SEPOLIA: {
     color: 'border-primary text-primary bg-primary/10',
-    label: 'ARB',
-    fullLabel: 'Arbitrum (Sepolia)',
+    label: 'BASE',
+    fullLabel: 'Base Sepolia',
   },
   ARBITRUM_ONE: {
     color: 'border-primary text-primary bg-primary/10',
-    label: 'ARB',
+    label: 'BASE',
     fullLabel: 'Arbitrum One',
   },
 };

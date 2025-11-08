@@ -12,6 +12,8 @@ import { Transaction } from '@/lib/types/wallet';
 import { formatCurrency } from '@/lib/utils/format';
 import { useAccount } from 'wagmi';
 import { useBackendBalance } from '@/hooks/use-backend-balance';
+import { useWalletTransactions } from '@/hooks/use-wallet-transactions';
+import { transformBackendTransactions } from '@/lib/utils/transform-transactions';
 
 interface BackendBalanceResponse {
   success: boolean;
@@ -29,6 +31,7 @@ export default function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const { address, isConnected } = useAccount();
   const { data, isLoading, error } = useBackendBalance(address);
+  const { data: transactionsData, isLoading: isLoadingTransactions } = useWalletTransactions(address);
 
   // Extract balance from backend response: { success: true, data: { balance: "21.0" } }
   const totalBRLA = (() => {
@@ -39,7 +42,10 @@ export default function Dashboard() {
     return Number.isFinite(n as number) ? (n as number) : 0;
   })();
 
-  const recentTransactions: Transaction[] = [];
+  // Transform backend transactions to UI format and get recent 3
+  const recentTransactions: Transaction[] = transactionsData?.data?.transactions
+    ? transformBackendTransactions(transactionsData.data.transactions).slice(0, 3)
+    : [];
 
   const handleTransactionClick = (transaction: Transaction) => {
     setSelectedTransaction(transaction);

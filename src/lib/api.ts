@@ -1,4 +1,5 @@
 import { getEnv } from './env';
+import { BackendTransactionsResponse } from './types/wallet';
 
 type Json = Record<string, unknown>;
 
@@ -34,4 +35,10 @@ export async function getBalance(address: string): Promise<{ balance?: string | 
   const safe = address?.trim();
   if (!safe) throw new Error('Endereco invalido');
   return request<{ balance?: string | number } & Json>(`/balance/${safe}`);
+}
+
+export async function getWalletTransactions(address: string): Promise<BackendTransactionsResponse> {
+  const safe = address?.trim();
+  if (!safe) throw new Error('Endereco invalido');
+  return request<BackendTransactionsResponse>(`/wallets/${safe}/transactions`);
 }

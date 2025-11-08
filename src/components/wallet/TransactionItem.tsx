@@ -1,14 +1,14 @@
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { NetworkBadge } from '@/components/ui/network-badge';
-import { TransactionStatus } from '@/components/wallet/TransactionStatus';
 import { ExplorerLink } from '@/components/wallet/ExplorerLink';
 import { formatCurrency, formatRelativeTime, formatCrypto, truncateAddress } from '@/lib/utils/format';
 import { Transaction } from '@/lib/types/wallet';
-
+import { cn } from '@/lib/utils';
 interface TransactionItemProps {
   transaction: Transaction;
   onClick?: () => void;
+  className?: string;
 }
 
 const statusMap: Record<Transaction['status'], 'pending' | 'success' | 'failed'> = {
@@ -17,13 +17,13 @@ const statusMap: Record<Transaction['status'], 'pending' | 'success' | 'failed'>
   failed: 'failed',
 };
 
-export function TransactionItem({ transaction, onClick }: TransactionItemProps) {
+export function TransactionItem({ transaction, onClick, className }: TransactionItemProps) {
   const isDeposit = transaction.type === 'deposit';
   const DirectionIcon = isDeposit ? ArrowDownLeft : ArrowUpRight;
 
   return (
     <div
-      className="flex items-start justify-between p-4 rounded-xl hover:bg-secondary/50 transition-colors cursor-pointer border border-border/50"
+      className={cn("flex items-start justify-between p-4 rounded-xl hover:bg-secondary/50 transition-colors cursor-pointer border border-border/50", className)}
       onClick={onClick}
     >
       <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -40,10 +40,10 @@ export function TransactionItem({ transaction, onClick }: TransactionItemProps) 
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <p className="text-sm text-muted-foreground">{formatRelativeTime(transaction.createdAt)}</p>
-            {transaction.hash && (
+            {transaction.hash && transaction.explorerUrl && (
               <>
                 <span className="text-muted-foreground">•</span>
-                <ExplorerLink hash={transaction.hash} network={transaction.network!}>
+                <ExplorerLink url={transaction.explorerUrl}>
                   <span className="text-xs font-mono">{truncateAddress(transaction.hash, 4, 4)}</span>
                 </ExplorerLink>
               </>
@@ -59,7 +59,6 @@ export function TransactionItem({ transaction, onClick }: TransactionItemProps) 
         {transaction.amountBRL && (
           <p className="text-sm text-muted-foreground mb-2">{formatCurrency(transaction.amountBRL)}</p>
         )}
-        <TransactionStatus state={statusMap[transaction.status]} showLabel={false} />
       </div>
     </div>
   );

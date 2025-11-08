@@ -32,6 +32,7 @@ export interface Transaction {
   network?: NetworkType;
   hash?: string;
   address?: string;
+  explorerUrl?: string;
   createdAt: Date;
   completedAt?: Date;
   fee?: number;
@@ -43,4 +44,27 @@ export interface WalletBalance {
   BTC: number;
   ETH: number;
   BRLA: number;
+}
+
+// Backend transaction response types
+export interface BackendTransaction {
+  hash: string;
+  tipo: string;
+  url: string;
+  data: string;
+  hora: string;
+  valorFormatado: string;
+  valorRaw: string;
+  from: string;
+  to: string;
+  blockNumber: number;
+  confirmations: number;
+}
+
+export interface BackendTransactionsResponse {
+  success: boolean;
+  data: {
+    wallet: string;
+    transactions: BackendTransaction[];
+  };
 }
