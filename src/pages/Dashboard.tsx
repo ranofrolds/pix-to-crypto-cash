@@ -76,21 +76,12 @@ export default function Dashboard() {
             {isLoading ? '---' : balanceVisible ? formatCurrency(totalBRLA, 'BRL') : 'R$ ***'}
           </h3>
 
-          <div className="flex gap-3">
-            <Button
-              className="flex-1 h-auto py-3 bg-accent hover:bg-accent/90"
-              onClick={() => navigate('/deposit')} disabled={!isConnected}
-            >
-              Depositar
-            </Button>
-            <Button
-              variant="secondary"
-              className="flex-1 h-auto py-3"
-              onClick={() => {}} disabled={!isConnected}
-            >
-              Retirar fundos
-            </Button>
-          </div>
+          <Button
+            className="flex-1 h-auto py-3 bg-accent hover:bg-accent/90"
+            onClick={() => navigate('/deposit')} disabled={!isConnected}
+          >
+            Depositar
+          </Button>
         </Card>
 
 

@@ -18,14 +18,14 @@ export default function Deposit() {
   const navigate = useNavigate();
   const { address, isConnected } = useAccount();
   const [amountBRL, setAmountBRL] = useState(0);
-  const [selectedAsset, setSelectedAsset] = useState<AssetSymbol | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<AssetSymbol | null>('BRLA');
   const envNetwork: NetworkType = targetChain.id === 42161 ? 'ARBITRUM_ONE' : 'ARBITRUM_SEPOLIA';
   const [selectedNetwork] = useState<NetworkType>(envNetwork);
   const [pixData, setPixData] = useState<PixPayload | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSubmittingWebhook, setIsSubmittingWebhook] = useState(false);
 
-  const fee = amountBRL > 0 ? Math.max(3.9, amountBRL * 0.015) : 0;
+  const fee = amountBRL > 0 ? Math.max(0.85, amountBRL * 0.015) : 0;
   const estimatedAmount = amountBRL; // BRLA 1:1 com BRL
   const totalAmount = amountBRL + fee;
 
@@ -110,11 +110,11 @@ export default function Deposit() {
         </div>
       </header>
 
-      <div className="container max-w-2xl mx-auto px-4 py-6 space-y-6">
+      <div className="container max-w-2xl mx-auto px-4 py-6 space-y-6 mt-12">
         {!pixData ? (
           <>
             <Card className="p-6 bg-gradient-card border-border/50">
-              <AmountInput value={amountBRL} onChange={setAmountBRL} error={amountError} min={1} max={50000} />
+              <AmountInput value={amountBRL} onChange={setAmountBRL} error={amountError} min={1} max={5000} />
             </Card>
 
             <Card className="p-6 bg-gradient-card border-border/50">
@@ -122,7 +122,7 @@ export default function Deposit() {
                 <div>
                   <label className="text-sm font-medium mb-3 block">Ativo a Creditar</label>
                   <div className="grid grid-cols-3 gap-2">
-                    <Button variant={selectedAsset === 'BRLA' ? 'default' : 'outline'} onClick={() => setSelectedAsset('BRLA')} className="h-12">
+                    <Button variant={selectedAsset === 'BRLA' ? 'default' : 'outline'} onClick={() => setSelectedAsset('BRLA')} className="h-12" disabled>
                       BRLA
                     </Button>
                   </div>
@@ -150,7 +150,7 @@ export default function Deposit() {
               ) : (
                 <>
                   <Sparkles className="w-5 h-5" />
-                  Gerar PIX
+                  Gerar Pix
                 </>
               )}
             </Button>

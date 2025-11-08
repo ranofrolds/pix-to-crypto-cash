@@ -8,11 +8,6 @@ interface QrCanvasProps {
 }
 
 export function QrCanvas({ data, size = 240 }: QrCanvasProps) {
-  const handleDownload = () => {
-    // Mock download - in production, generate actual QR code and download
-    console.log('Download QR Code:', data);
-  };
-
   return (
     <div className="space-y-4">
       <Card className="p-8 bg-white flex items-center justify-center">
@@ -32,20 +27,6 @@ export function QrCanvas({ data, size = 240 }: QrCanvasProps) {
           </div>
         </div>
       </Card>
-
-      <div className="space-y-2">
-        <p className="text-sm text-muted-foreground text-center">
-          Abra seu banco, escolha Pagar via PIX e escaneie o QR Code
-        </p>
-        <Button
-          variant="outline"
-          className="w-full gap-2"
-          onClick={handleDownload}
-        >
-          <Download className="w-4 h-4" />
-          Baixar QR Code
-        </Button>
-      </div>
     </div>
   );
 }
