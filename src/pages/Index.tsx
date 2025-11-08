@@ -5,9 +5,11 @@ import { Card } from '@/components/ui/card';
 import { WalletConnectButton } from '@/components/wallet/WalletConnectButton';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { ConnectWallet } from '@coinbase/onchainkit/wallet';
+import { useAccount } from 'wagmi';
 
 export default function Index() {
   const navigate = useNavigate();
+  const { isConnected } = useAccount();
   const featuresAnimation = useScrollAnimation();
   const howItWorksAnimation = useScrollAnimation();
   const ctaAnimation = useScrollAnimation();
@@ -86,19 +88,30 @@ export default function Index() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <ConnectWallet
-                render={({ onClick, isLoading }) => (
-                  <Button
-                    size="lg"
-                    className="text-lg h-14 px-8 shadow-glow"
-                    onClick={onClick}
-                    disabled={isLoading}
-                  >
-                    Conectar Wallet
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Button>
-                )}
-              />
+              {isConnected ? (
+                <Button
+                  size="lg"
+                  className="text-lg h-14 px-8 shadow-glow"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  Go to dashboard
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              ) : (
+                <ConnectWallet
+                  render={({ onClick, isLoading }) => (
+                    <Button
+                      size="lg"
+                      className="text-lg h-14 px-8 shadow-glow"
+                      onClick={onClick}
+                      disabled={isLoading}
+                    >
+                      Conectar Wallet
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                  )}
+                />
+              )}
               <Button
                 size="lg"
                 variant="outline"
