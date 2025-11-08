@@ -13,6 +13,15 @@ import { formatCurrency } from '@/lib/utils/format';
 import { useAccount } from 'wagmi';
 import { useBackendBalance } from '@/hooks/use-backend-balance';
 
+interface BackendBalanceResponse {
+  success: boolean;
+  data: {
+    address: string;
+    balance: string;
+    balanceRaw: string;
+  };
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [balanceVisible, setBalanceVisible] = useState(true);
@@ -20,11 +29,16 @@ export default function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const { address, isConnected } = useAccount();
   const { data, isLoading, error } = useBackendBalance(address);
+
+  // Extract balance from backend response: { success: true, data: { balance: "21.0" } }
   const totalBRLA = (() => {
-    const b = (data as any)?.balance;
-    const n = typeof b === 'string' ? Number(b) : (b as number | undefined);
+    if (!data) return 0;
+    const backendResponse = data as unknown as BackendBalanceResponse;
+    const balance = backendResponse?.data?.balance;
+    const n = typeof balance === 'string' ? Number(balance) : (balance as number | undefined);
     return Number.isFinite(n as number) ? (n as number) : 0;
   })();
+
   const recentTransactions: Transaction[] = [];
 
   const handleTransactionClick = (transaction: Transaction) => {
@@ -39,10 +53,12 @@ export default function Dashboard() {
         <div className="container max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center shadow-glow">
-                <Wallet className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <h1 className="text-xl font-bold">CryptoWallet</h1>
+              <img
+                src="/refuconnect-logo.png"
+                alt="RefuConnect"
+                className="h-8 w-auto"
+              />
+              <h1 className="text-xl font-bold">RefuConnect</h1>
             </div>
             <WalletConnectButton />
           </div>
@@ -77,7 +93,8 @@ export default function Dashboard() {
           </h3>
 
           <Button
-            className="flex-1 h-auto py-3 bg-accent hover:bg-accent/90"
+            className="flex-1 h-12 py-3 text-lg"
+            size="lg"
             onClick={() => navigate('/deposit')} disabled={!isConnected}
           >
             Depositar

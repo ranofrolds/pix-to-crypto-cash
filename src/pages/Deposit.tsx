@@ -103,8 +103,7 @@ export default function Deposit() {
               </p>
             )}
             <div>
-              <h1 className="text-xl font-bold">Depositar via PIX</h1>
-              <p className="text-sm text-muted-foreground">{pixData ? 'Complete o pagamento' : 'Configure seu depósito'}</p>
+              <h1 className="text-xl font-bold">Depositar via Pix</h1>
             </div>
           </div>
         </div>
@@ -115,6 +114,11 @@ export default function Deposit() {
           <>
             <Card className="p-6 bg-gradient-card border-border/50">
               <AmountInput value={amountBRL} onChange={setAmountBRL} error={amountError} min={1} max={5000} />
+              {!canGenerate && isConnected && (amountBRL === 0 || !selectedAsset) && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  {!selectedAsset ? 'Selecione o ativo BRLA para continuar.' : 'Informe um valor válido para gerar o Pix.'}
+                </p>
+              )}
             </Card>
 
             <Card className="p-6 bg-gradient-card border-border/50">
@@ -154,12 +158,6 @@ export default function Deposit() {
                 </>
               )}
             </Button>
-
-            {!canGenerate && isConnected && (amountBRL === 0 || !selectedAsset) && (
-              <p className="text-center text-sm text-muted-foreground">
-                {!selectedAsset ? 'Selecione o ativo BRLA para continuar' : 'Informe um valor válido para gerar o PIX'}
-              </p>
-            )}
           </>
         ) : (
           <PixPaymentCard
