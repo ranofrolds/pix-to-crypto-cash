@@ -23,8 +23,10 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": ["./src/*"],
+      "@animation.json": ["./public/animation.json"]
+    },
+    "resolveJsonModule": true
   },
   "include": ["src"]
 }
