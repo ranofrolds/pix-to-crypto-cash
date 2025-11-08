@@ -10,7 +10,7 @@ interface AmountInputProps {
   error?: string;
 }
 
-export function AmountInput({ value, onChange, min = 1, max = 50000, error }: AmountInputProps) {
+export function AmountInput({ value, onChange, min = 1, max = 5000, error }: AmountInputProps) {
   const [displayValue, setDisplayValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
 
@@ -88,11 +88,6 @@ export function AmountInput({ value, onChange, min = 1, max = 50000, error }: Am
       </div>
       {error && (
         <p className="text-sm text-destructive">{error}</p>
-      )}
-      {!error && (
-        <p className="text-xs text-muted-foreground">
-          Mínimo: R$ {min.toFixed(2)} • Máximo: R$ {max.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-        </p>
       )}
     </div>
   );

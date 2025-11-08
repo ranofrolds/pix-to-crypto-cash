@@ -62,9 +62,6 @@ export function CopyField({ value, label }: CopyFieldProps) {
           )}
         </Button>
       </div>
-      <p className="text-xs text-muted-foreground">
-        No seu banco, escolha PIX copia e cola e cole este código
-      </p>
     </div>
   );
 }

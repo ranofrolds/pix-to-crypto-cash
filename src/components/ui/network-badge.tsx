@@ -48,7 +48,7 @@ export function NetworkBadge({ network, showFullName = false }: NetworkBadgeProp
   const config = networkConfig[network];
 
   return (
-    <Badge variant="outline" className={`${config.color} font-mono text-xs px-2 py-0.5`}>
+    <Badge variant="outline" className={`${config.color} font-mono text-md px-2 py-0.5`}>
       {showFullName ? config.fullLabel : config.label}
     </Badge>
   );
