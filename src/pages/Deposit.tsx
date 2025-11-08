@@ -15,6 +15,19 @@ import { useAccount } from 'wagmi';
 import { postPixWebhook } from '@/lib/api';
 import { targetChain } from '@/lib/wagmi';
 
+interface PixWebhookResponse {
+  success: boolean;
+  message: string;
+  data: {
+    txHash: string;
+    blockNumber: number;
+    gasUsed: string;
+    walletAddress: string;
+    amount: string;
+    explorer: string;
+  };
+}
+
 export default function Deposit() {
   const navigate = useNavigate();
   const { address, isConnected } = useAccount();
@@ -73,9 +86,24 @@ export default function Deposit() {
     try {
       setIsSubmittingWebhook(true);
       const amountStr = String(Math.floor(estimatedAmount));
-      await postPixWebhook({ wallet_address: address, amount: amountStr });
-      toast({ title: 'Pagamento registrado', description: 'Acabamos de processar seu crédito on-chain' });
-      navigate('/history');
+      const response = await postPixWebhook({ wallet_address: address, amount: amountStr }) as unknown as PixWebhookResponse;
+
+      // Store receipt data in sessionStorage
+      const receiptData = {
+        txHash: response?.data?.txHash || '',
+        blockNumber: response?.data?.blockNumber || 0,
+        gasUsed: response?.data?.gasUsed || '0',
+        walletAddress: address,
+        amount: amountStr,
+        explorer: response?.data?.explorer || '',
+        timestamp: new Date().toISOString()
+      };
+      sessionStorage.setItem('receipt_data', JSON.stringify(receiptData));
+
+      toast({ title: 'Pagamento registrado', description: 'Estamos processando seu crédito on-chain' });
+
+      // Redirect to receipt page
+      navigate(`/receipt/${receiptData.txHash}`);
     } catch (e: any) {
       const msg = String(e?.message || '');
       const description = /http|network|fetch|Failed to fetch/i.test(msg)
