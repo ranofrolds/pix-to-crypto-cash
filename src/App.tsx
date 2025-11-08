@@ -11,6 +11,7 @@ import Deposit from "./pages/Deposit";
 import History from "./pages/History";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import RequireWallet from "./components/auth/RequireWallet";
 
 const queryClient = new QueryClient();
 
@@ -32,7 +33,14 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route
+            path="/dashboard"
+            element={
+              <RequireWallet>
+                <Dashboard />
+              </RequireWallet>
+            }
+          />
           <Route path="/deposit" element={<Deposit />} />
           
           <Route path="/history" element={<History />} />
