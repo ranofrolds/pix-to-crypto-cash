@@ -8,25 +8,31 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 4%;
-    --foreground: 0 0% 98%;
+    /* Refuconnect Brand Colors
+       Background: #0B0119 (Crimson Black) or #170420 (Abyss Purple)
+       Accents/Gradients: #C8283C → #FF785A
+       Light/Highlight: #FFC8B4
+       Logo/White: #FFFFFF on dark background
+    */
+    --background: 288 91% 5%; /* #0B0119 Crimson Black */
+    --foreground: 0 0% 100%; /* #FFFFFF */
 
-    --card: 0 0% 7%;
+    --card: 285 80% 8%; /* #170420 Abyss Purple */
     --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 7%;
+    --popover: 285 80% 8%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 270 75% 60%;
+    --primary: 351 69% 48%; /* #C8283C Crimson Red */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 10%;
+    --secondary: 285 80% 8%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 55%;
+    --muted: 288 50% 10%;
+    --muted-foreground: 0 0% 60%;
 
-    --accent: 250 60% 58%;
+    --accent: 12 100% 68%; /* #FF785A Warm Coral */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 60%;
@@ -35,9 +41,9 @@ All colors MUST be HSL.
     --warning: 35 80% 55%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 270 75% 60%;
+    --border: 288 50% 15%;
+    --input: 288 50% 15%;
+    --ring: 351 69% 48%;
 
     --radius: 0.75rem;
 
@@ -46,25 +52,25 @@ All colors MUST be HSL.
     --network-ethereum: 220 95% 60%;
     --network-bitcoin: 25 100% 55%;
 
-    /* Subtle gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(270 75% 60% / 0.1), hsl(250 60% 58% / 0.06));
-    --gradient-hero: linear-gradient(135deg, hsl(270 75% 60% / 0.05), transparent);
-    --gradient-success: linear-gradient(135deg, hsl(250 60% 58% / 0.1), hsl(260 65% 60% / 0.06));
-    --gradient-card: linear-gradient(135deg, hsl(0 0% 8% / 0.95), hsl(0 0% 6% / 0.95));
-    --gradient-glow: radial-gradient(circle at 50% 0%, hsl(270 75% 60% / 0.06), transparent 70%);
-    
-    --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.6);
-    --shadow-glow: 0 0 30px hsl(270 75% 60% / 0.12);
-    --shadow-glow-accent: 0 0 30px hsl(250 60% 58% / 0.12);
+    /* Refuconnect Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(351 69% 48% / 1), hsl(12 100% 68% / 1)); /* Crimson Red → Warm Coral */
+    --gradient-hero: linear-gradient(135deg, hsl(351 69% 48% / 0.15), transparent);
+    --gradient-success: linear-gradient(135deg, hsl(12 100% 68% / 0.2), hsl(351 69% 48% / 0.1));
+    --gradient-card: linear-gradient(135deg, hsl(285 80% 8% / 0.95), hsl(288 91% 5% / 0.95));
+    --gradient-glow: radial-gradient(circle at 50% 0%, hsl(351 69% 48% / 0.12), transparent 70%);
 
-    --sidebar-background: 0 0% 5%;
+    --shadow-soft: 0 4px 20px -4px hsl(288 91% 5% / 0.8);
+    --shadow-glow: 0 0 40px hsl(351 69% 48% / 0.2);
+    --shadow-glow-accent: 0 0 40px hsl(12 100% 68% / 0.2);
+
+    --sidebar-background: 288 91% 5%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 270 75% 60%;
+    --sidebar-primary: 351 69% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent: 285 80% 8%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 270 75% 60%;
+    --sidebar-border: 288 50% 15%;
+    --sidebar-ring: 351 69% 48%;
   }
 }
 
