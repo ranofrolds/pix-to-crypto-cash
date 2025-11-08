@@ -7,7 +7,7 @@ import { sdk } from "@farcaster/miniapp-sdk";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Deposit from "./pages/Deposit";
-
+import Receipt from "./pages/Receipt";
 import History from "./pages/History";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -42,7 +42,7 @@ const App = () => {
             }
           />
           <Route path="/deposit" element={<Deposit />} />
-          
+          <Route path="/receipt/:txHash" element={<Receipt />} />
           <Route path="/history" element={<History />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
