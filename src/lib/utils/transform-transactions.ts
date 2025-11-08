@@ -7,6 +7,13 @@ export function transformBackendTransaction(tx: BackendTransaction): Transaction
   // Parse the amount from "30.0 DFLCOM1" format
   const amountMatch = tx.valorFormatado.match(/^([\d.]+)\s+/);
   const amount = amountMatch ? parseFloat(amountMatch[1]) : 0;
+  const rawGasUsed =
+    typeof tx.gasUsed === 'number'
+      ? tx.gasUsed
+      : typeof tx.gasUsed === 'string' && tx.gasUsed.trim() !== ''
+        ? Number(tx.gasUsed)
+        : undefined;
+  const gasUsed = typeof rawGasUsed === 'number' && Number.isFinite(rawGasUsed) ? rawGasUsed : undefined;
 
   // Combine date and time to create full timestamp
   // Backend format: "2025-11-08" and "03:42:12"
@@ -34,6 +41,7 @@ export function transformBackendTransaction(tx: BackendTransaction): Transaction
     explorerUrl: tx.url,
     createdAt,
     completedAt: tx.confirmations > 0 ? createdAt : undefined,
+    gasUsed,
   };
 }
 

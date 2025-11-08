@@ -110,10 +110,6 @@ export default function Deposit() {
       };
 
       setPixData(pixPayload);
-      toast({
-        title: 'PIX Gerado!',
-        description: 'Pague usando seu aplicativo bancário'
-      });
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error || '');
       const description = /http|network|fetch|Failed to fetch/i.test(msg)
@@ -189,22 +185,12 @@ export default function Deposit() {
             queryClient.invalidateQueries({ queryKey: ['backend-balance', address] });
             queryClient.invalidateQueries({ queryKey: ['wallet-transactions', address] });
 
-            toast({
-              title: 'Pagamento confirmado!',
-              description: `${formatCurrency(credited)} creditados com sucesso`,
-            });
-
             // Navigate to receipt page with real tx hash
             setTimeout(() => {
               navigate(`/receipt/${latestTx.hash}`);
             }, 1500);
           } else {
             // Fallback: no transactions found, go to dashboard
-            toast({
-              title: 'Pagamento confirmado!',
-              description: `${formatCurrency(credited)} creditados com sucesso`,
-            });
-
             queryClient.invalidateQueries({ queryKey: ['backend-balance', address] });
 
             setTimeout(() => {
@@ -215,11 +201,6 @@ export default function Deposit() {
           console.error('Failed to fetch latest transaction:', error);
 
           // Fallback on error
-          toast({
-            title: 'Pagamento confirmado!',
-            description: `${formatCurrency(credited)} creditados com sucesso`,
-          });
-
           queryClient.invalidateQueries({ queryKey: ['backend-balance', address] });
 
           setTimeout(() => {
