@@ -64,7 +64,6 @@ export default function Dashboard() {
                 alt="RefuConnect"
                 className="h-8 w-auto"
               />
-              <h1 className="text-xl font-bold">RefuConnect</h1>
             </div>
             <WalletConnectButton />
           </div>

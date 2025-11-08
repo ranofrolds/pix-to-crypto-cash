@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,24 +12,25 @@ import { PixPayload } from '@/lib/types/pix';
 import { NetworkType, AssetSymbol } from '@/lib/types/wallet';
 import { toast } from '@/hooks/use-toast';
 import { useAccount } from 'wagmi';
-import { postPixWebhook } from '@/lib/api';
+import { createPixCharge, getBalance, getWalletTransactions } from '@/lib/api';
 import { targetChain } from '@/lib/wagmi';
+import { useBalancePolling } from '@/hooks/use-balance-polling';
+import { formatCurrency } from '@/lib/utils/format';
+import { transformBackendTransaction } from '@/lib/utils/transform-transactions';
+import { useQueryClient } from '@tanstack/react-query';
 
-interface PixWebhookResponse {
+interface BackendBalanceResponse {
   success: boolean;
-  message: string;
   data: {
-    txHash: string;
-    blockNumber: number;
-    gasUsed: string;
-    walletAddress: string;
-    amount: string;
-    explorer: string;
+    address: string;
+    balance: string;
+    balanceRaw: string;
   };
 }
 
 export default function Deposit() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { address, isConnected } = useAccount();
   const [amountBRL, setAmountBRL] = useState(0);
   const [selectedAsset, setSelectedAsset] = useState<AssetSymbol | null>('BRLA');
@@ -37,11 +38,21 @@ export default function Deposit() {
   const [selectedNetwork] = useState<NetworkType>(envNetwork);
   const [pixData, setPixData] = useState<PixPayload | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isSubmittingWebhook, setIsSubmittingWebhook] = useState(false);
+  const [initialBalance, setInitialBalance] = useState(0);
+  const [enablePolling, setEnablePolling] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
-  const fee = amountBRL > 0 ? Math.max(0.85, amountBRL * 0.015) : 0;
+  const [calculatedFee, setCalculatedFee] = useState(0);
+  const fee = calculatedFee > 0 ? calculatedFee : (amountBRL > 0 ? Math.max(0.85, amountBRL * 0.015) : 0);
   const estimatedAmount = amountBRL; // BRLA 1:1 com BRL
   const totalAmount = amountBRL + fee;
+
+  // Balance polling hook
+  const { balanceChanged, newBalance, isPolling, timeoutReached, stopPolling } = useBalancePolling(
+    address,
+    initialBalance,
+    enablePolling
+  );
 
   const amountError =
     amountBRL > 0 && amountBRL < 1
@@ -52,78 +63,190 @@ export default function Deposit() {
 
   const canGenerate = amountBRL >= 1 && amountBRL <= 50000 && !pixData && selectedAsset !== null;
 
-  const handleGeneratePix = () => {
+  const handleGeneratePix = async () => {
+    if (!isConnected || !address) {
+      toast({
+        title: 'Conecte sua carteira',
+        description: 'Faça login para gerar o PIX',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setIsGenerating(true);
-    setTimeout(() => {
-      const mockPix: PixPayload = {
-        raw: `00020126580014br.gov.bcb.pix0136${Date.now()}@cryptowallet.com.br5204000053039865802BR5920CRYPTOWALLET LTDA6009SAO PAULO62070503***6304${Math.random()
-          .toString(36)
-          .substring(7)
-          .toUpperCase()}`,
-        chave: 'pix@cryptowallet.com.br',
-        valor: totalAmount,
+    try {
+      // 1. Captura balance inicial antes de gerar PIX
+      const balanceResponse = await getBalance(address);
+      const backendResponse = balanceResponse as unknown as BackendBalanceResponse;
+      const balance = backendResponse?.data?.balance;
+      const currentBalance = typeof balance === 'string' ? Number(balance) : (balance as number | undefined);
+      const balanceValue = Number.isFinite(currentBalance as number) ? (currentBalance as number) : 0;
+
+      setInitialBalance(balanceValue);
+
+      // 2. Gera PIX via Woovi
+      const response = await createPixCharge(address, totalAmount);
+
+      if (!response.success) {
+        throw new Error(response.message || 'Falha ao gerar PIX');
+      }
+
+      // Converte centavos para BRL
+      const feeInBRL = response.data.fee / 100;
+      const valueInBRL = response.data.value / 100;
+
+      setCalculatedFee(feeInBRL);
+
+      const pixPayload: PixPayload = {
+        raw: response.data.brCode,
+        brCode: response.data.brCode,
+        qrCodeImage: response.data.qrCodeImage,
+        chave: 'pix@woovi.com',
+        valor: valueInBRL,
         descricao: `Depósito para ${selectedAsset} na rede ${selectedNetwork}`,
-        txid: `PIX${Date.now()}${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
-        beneficiario: 'CRYPTOWALLET LTDA',
-        expiraEm: new Date(Date.now() + 1000 * 60 * 5),
+        txid: response.data.transactionId,
+        beneficiario: 'MOBILIZE SOLUCOES',
+        expiraEm: new Date(response.data.expiresDate),
         cidade: 'SAO PAULO',
       };
 
-      setPixData(mockPix);
+      setPixData(pixPayload);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error || '');
+      const description = /http|network|fetch|Failed to fetch/i.test(msg)
+        ? 'Servidor indisponível, tente mais tarde'
+        : msg || 'Erro ao gerar PIX';
+
+      toast({
+        title: 'Erro ao gerar PIX',
+        description,
+        variant: 'destructive'
+      });
+    } finally {
       setIsGenerating(false);
-      toast({ title: 'PIX Gerado!', description: 'Pague usando seu aplicativo bancário' });
-    }, 800);
+    }
   };
 
-  const handleCancel = () => setPixData(null);
+  const handleCancel = () => {
+    setPixData(null);
+    setEnablePolling(false);
+    stopPolling();
+    setIsProcessingPayment(false);
+  };
 
-  const handleMarkAsPaid = async () => {
+  const handleMarkAsPaid = () => {
     if (!isConnected || !address) {
-      toast({ title: 'Conecte sua carteira', description: 'Faça login para continuar', variant: 'destructive' });
+      toast({
+        title: 'Conecte sua carteira',
+        description: 'Faça login para continuar',
+        variant: 'destructive'
+      });
       return;
     }
     if (!pixData) return;
-    try {
-      setIsSubmittingWebhook(true);
-      const amountStr = String(Math.floor(estimatedAmount));
-      const response = await postPixWebhook({ wallet_address: address, amount: amountStr }) as unknown as PixWebhookResponse;
 
-      // Store receipt data in sessionStorage
-      const receiptData = {
-        txHash: response?.data?.txHash || '',
-        blockNumber: response?.data?.blockNumber || 0,
-        gasUsed: response?.data?.gasUsed || '0',
-        walletAddress: address,
-        amount: amountStr,
-        explorer: response?.data?.explorer || '',
-        timestamp: new Date().toISOString()
-      };
-      sessionStorage.setItem('receipt_data', JSON.stringify(receiptData));
-
-      toast({ title: 'Pagamento registrado', description: 'Estamos processando seu crédito on-chain' });
-
-      // Redirect to receipt page
-      navigate(`/receipt/${receiptData.txHash}`);
-    } catch (e: any) {
-      const msg = String(e?.message || '');
-      const description = /http|network|fetch|Failed to fetch/i.test(msg)
-        ? 'Servidor indisponível, tente mais tarde'
-        : 'Falha ao notificar o servidor';
-      toast({ title: 'Erro', description, variant: 'destructive' });
-    } finally {
-      setIsSubmittingWebhook(false);
-    }
+    // Inicia long polling
+    setIsProcessingPayment(true);
+    setEnablePolling(true);
+    toast({
+      title: 'Aguardando pagamento',
+      description: 'Verificando confirmação do PIX...'
+    });
   };
 
   const handleExpire = () =>
     toast({ title: 'PIX Expirado', description: 'Este PIX expirou. Gere um novo para continuar.', variant: 'destructive' });
 
+  // Effect: Listen to balance changes from polling
+  useEffect(() => {
+    if (balanceChanged && newBalance > initialBalance && address) {
+      setEnablePolling(false);
+      setIsProcessingPayment(true);
+      const credited = newBalance - initialBalance;
+
+      // Fetch latest transaction
+      const fetchLatestTransaction = async () => {
+        try {
+          const transactionsResponse = await getWalletTransactions(address);
+          const transactions = transactionsResponse?.data?.transactions || [];
+
+          if (transactions.length > 0) {
+            // Get the most recent transaction
+            const latestTx = transformBackendTransaction(transactions[0]);
+
+            // Store receipt data in sessionStorage
+            const receiptData = {
+              txHash: latestTx.hash,
+              blockNumber: 0, // Not available from backend
+              gasUsed: '0', // Not available from backend
+              walletAddress: address,
+              amount: String(latestTx.amountBRL),
+              explorer: latestTx.explorerUrl,
+              timestamp: latestTx.createdAt.toISOString(),
+            };
+            sessionStorage.setItem('receipt_data', JSON.stringify(receiptData));
+
+            // Invalidate caches
+            queryClient.invalidateQueries({ queryKey: ['backend-balance', address] });
+            queryClient.invalidateQueries({ queryKey: ['wallet-transactions', address] });
+
+            // Navigate to receipt page with real tx hash
+            setTimeout(() => {
+              navigate(`/receipt/${latestTx.hash}`);
+            }, 1500);
+          } else {
+            // Fallback: no transactions found, go to dashboard
+            queryClient.invalidateQueries({ queryKey: ['backend-balance', address] });
+
+            setTimeout(() => {
+              navigate('/dashboard');
+            }, 1500);
+          }
+        } catch (error) {
+          console.error('Failed to fetch latest transaction:', error);
+
+          // Fallback on error
+          queryClient.invalidateQueries({ queryKey: ['backend-balance', address] });
+
+          setTimeout(() => {
+            navigate('/dashboard');
+          }, 1500);
+        }
+      };
+
+      fetchLatestTransaction();
+    }
+  }, [balanceChanged, newBalance, initialBalance, address, navigate, queryClient]);
+
+  // Effect: Handle polling timeout
+  useEffect(() => {
+    if (timeoutReached && isPolling === false && enablePolling) {
+      setEnablePolling(false);
+      stopPolling();
+      setIsProcessingPayment(true);
+      toast({
+        title: 'Tempo esgotado',
+        description: 'Pagamento ainda não confirmado. Verifique seu saldo no Dashboard.',
+        variant: 'default',
+      });
+
+      // Navigate to dashboard anyway
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
+    }
+  }, [timeoutReached, isPolling, enablePolling, navigate, stopPolling]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Full Backdrop Loading */}
       <FullBackdropLoading
-        isOpen={isGenerating || isSubmittingWebhook}
-        message={isGenerating ? 'Gerando Pix...' : 'Confirmando pagamento...'}
+        isOpen={isGenerating || isProcessingPayment}
+        message={
+          isGenerating
+            ? 'Gerando Pix...'
+            : 'Aguardando confirmação do pagamento...'
+        }
       />
 
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-lg sticky top-0 z-10">
@@ -162,7 +285,7 @@ export default function Deposit() {
                   <label className="text-sm font-medium mb-3 block">Ativo a Creditar</label>
                   <div className="grid grid-cols-3 gap-2">
                     <Button variant={selectedAsset === 'BRLA' ? 'default' : 'outline'} onClick={() => setSelectedAsset('BRLA')} className="h-12" disabled>
-                      BRLA
+                      BRLR
                     </Button>
                   </div>
                 </div>
@@ -201,7 +324,7 @@ export default function Deposit() {
             onMarkAsPaid={handleMarkAsPaid}
             onExpire={handleExpire}
             confirmLabel="Já paguei"
-            confirmLoading={isSubmittingWebhook}
+            confirmLoading={isProcessingPayment}
           />
         )}
       </div>

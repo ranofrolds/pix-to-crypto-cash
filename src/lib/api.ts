@@ -1,5 +1,6 @@
 import { getEnv } from './env';
 import { BackendTransactionsResponse } from './types/wallet';
+import { WooviPixResponse } from './types/pix';
 
 type Json = Record<string, unknown>;
 
@@ -24,6 +25,22 @@ async function request<T = unknown>(path: string, init?: RequestInit): Promise<T
   return (await res.text()) as T;
 }
 
+/**
+ * Cria uma cobrança PIX via Woovi
+ * @param wallet_address - Endereço da carteira
+ * @param amountBRL - Valor em Reais (será convertido para centavos)
+ */
+export async function createPixCharge(wallet_address: string, amountBRL: number): Promise<WooviPixResponse> {
+  const valueInCents = Math.floor(amountBRL * 100);
+  return request<WooviPixResponse>('/get_qrcode', {
+    method: 'POST',
+    body: JSON.stringify({ wallet_address, value: valueInCents }),
+  });
+}
+
+/**
+ * @deprecated Use createPixCharge instead
+ */
 export async function postPixWebhook(payload: { wallet_address: string; amount?: string }): Promise<Json> {
   return request<Json>('/pixWebhook', {
     method: 'POST',

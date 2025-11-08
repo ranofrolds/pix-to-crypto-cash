@@ -36,6 +36,7 @@ export interface Transaction {
   createdAt: Date;
   completedAt?: Date;
   fee?: number;
+  gasUsed?: number;
 }
 
 export interface WalletBalance {
@@ -59,6 +60,7 @@ export interface BackendTransaction {
   to: string;
   blockNumber: number;
   confirmations: number;
+  gasUsed?: string | number;
 }
 
 export interface BackendTransactionsResponse {

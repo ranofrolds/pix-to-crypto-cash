@@ -73,14 +73,27 @@ export function PixPaymentCard({ pixData, onCancel, onMarkAsPaid, onExpire, conf
       {/* QR Code Section */}
       <div>
         <p className="mb-4">Escaneie o QR Code</p>
-        <QrCanvas data={pixData.raw} />
+        {pixData.qrCodeImage ? (
+          <div className="flex justify-center items-center bg-white p-4 rounded-lg">
+            <img
+              src={pixData.qrCodeImage}
+              alt="QR Code PIX"
+              className="w-full max-w-[300px] h-auto"
+            />
+          </div>
+        ) : (
+          <QrCanvas data={pixData.raw} />
+        )}
       </div>
 
       <Separator />
 
       {/* Copy & Paste Section */}
       <div>
-        <CopyField value={pixData.raw} label="Código PIX (copia e cola)" />
+        <CopyField
+          value={pixData.brCode || pixData.raw}
+          label="Código PIX (copia e cola)"
+        />
       </div>
 
       <Separator />

@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { copyToClipboard } from '@/lib/utils/format';
+import { useAccount } from 'wagmi';
+import { getWalletTransactions } from '@/lib/api';
+import { transformBackendTransaction } from '@/lib/utils/transform-transactions';
 
 interface ReceiptData {
   txHash: string;
@@ -19,20 +22,59 @@ interface ReceiptData {
 export default function Receipt() {
   const navigate = useNavigate();
   const { txHash } = useParams<{ txHash: string }>();
+  const { address } = useAccount();
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Try to get receipt data from sessionStorage
-    const storedData = sessionStorage.getItem('receipt_data');
-    if (storedData) {
-      try {
-        const data = JSON.parse(storedData);
-        setReceiptData(data);
-      } catch (e) {
-        console.error('Failed to parse receipt data', e);
+    const fetchReceiptData = async () => {
+      // Try to get receipt data from sessionStorage first
+      const storedData = sessionStorage.getItem('receipt_data');
+      if (storedData) {
+        try {
+          const data = JSON.parse(storedData);
+          setReceiptData(data);
+          setIsLoading(false);
+          return;
+        } catch (e) {
+          console.error('Failed to parse receipt data', e);
+        }
       }
-    }
-  }, [txHash]);
+
+      // Fallback: fetch from backend if sessionStorage is empty
+      if (address && txHash) {
+        try {
+          const transactionsResponse = await getWalletTransactions(address);
+          const transactions = transactionsResponse?.data?.transactions || [];
+
+          // Find transaction by hash
+          const transaction = transactions.find((tx) => tx.hash === txHash);
+
+          if (transaction) {
+            const transformedTx = transformBackendTransaction(transaction);
+
+            const data: ReceiptData = {
+              txHash: transformedTx.hash,
+              blockNumber: 0,
+              gasUsed: '0',
+              walletAddress: address,
+              amount: String(transformedTx.amountBRL),
+              explorer: transformedTx.explorerUrl,
+              timestamp: transformedTx.createdAt.toISOString(),
+            };
+
+            setReceiptData(data);
+          }
+        } catch (error) {
+          console.error('Failed to fetch transaction:', error);
+        }
+      }
+
+      setIsLoading(false);
+    };
+
+    fetchReceiptData();
+  }, [txHash, address]);
 
   const handleCopyTxHash = async () => {
     if (!receiptData?.txHash) return;
@@ -49,6 +91,17 @@ export default function Receipt() {
       window.open(receiptData.explorer, '_blank', 'noopener,noreferrer');
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="p-8 bg-gradient-card border-border/50 text-center">
+          <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Carregando recibo...</p>
+        </Card>
+      </div>
+    );
+  }
 
   if (!receiptData) {
     return (

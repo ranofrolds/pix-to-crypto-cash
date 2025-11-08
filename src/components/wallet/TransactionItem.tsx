@@ -59,6 +59,9 @@ export function TransactionItem({ transaction, onClick, className }: Transaction
         {transaction.amountBRL && (
           <p className="text-sm text-muted-foreground mb-2">{formatCurrency(transaction.amountBRL)}</p>
         )}
+        {typeof transaction.gasUsed === 'number' && (
+          <p className="text-xs text-muted-foreground font-mono">Gas usado: {transaction.gasUsed.toLocaleString()}</p>
+        )}
       </div>
     </div>
   );

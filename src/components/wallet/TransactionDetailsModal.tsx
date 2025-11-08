@@ -79,6 +79,15 @@ export function TransactionDetailsModal({
             </span>
           </div>
 
+          {typeof transaction.gasUsed === 'number' && (
+            <div className="flex justify-between items-start">
+              <span className="text-sm text-muted-foreground">Gas usado</span>
+              <span className="text-sm font-medium text-right font-mono">
+                {transaction.gasUsed.toLocaleString()}
+              </span>
+            </div>
+          )}
+
           {transaction.hash && (
             <div className="flex justify-between items-start">
               <span className="text-sm text-muted-foreground">Transação</span>
