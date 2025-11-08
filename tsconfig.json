@@ -4,8 +4,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@animation.json": ["./public/animation.json"]
     },
+    "resolveJsonModule": true,
     "noImplicitAny": false,
     "noUnusedParameters": false,
     "skipLibCheck": true,

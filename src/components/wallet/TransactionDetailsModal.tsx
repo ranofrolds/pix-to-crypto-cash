@@ -97,7 +97,7 @@ export function TransactionDetailsModal({
                 className="h-auto p-0 text-sm font-medium"
                 onClick={() => {
                   // In real app, would open block explorer
-                  window.open(`https://polygonscan.com/tx/${transaction.hash}`, '_blank');
+                  window.open(transaction.explorerUrl, '_blank');
                 }}
               >
                 Ver recibo

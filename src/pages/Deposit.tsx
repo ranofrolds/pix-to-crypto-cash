@@ -8,6 +8,7 @@ import { ConversionHint } from '@/components/pix/ConversionHint';
 import { PixPaymentCard } from '@/components/pix/PixPaymentCard';
 import { NetworkBadge } from '@/components/ui/network-badge';
 import { FullBackdropLoading } from '@/components/ui/full-backdrop-loading';
+import { SuccessAnimation } from '@/components/ui/success-animation';
 import { PixPayload } from '@/lib/types/pix';
 import { NetworkType, AssetSymbol } from '@/lib/types/wallet';
 import { toast } from '@/hooks/use-toast';
@@ -40,7 +41,8 @@ export default function Deposit() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [initialBalance, setInitialBalance] = useState(0);
   const [enablePolling, setEnablePolling] = useState(false);
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [creditedAmount, setCreditedAmount] = useState(0);
 
   const [calculatedFee, setCalculatedFee] = useState(0);
   const fee = calculatedFee > 0 ? calculatedFee : (amountBRL > 0 ? Math.max(0.85, amountBRL * 0.015) : 0);
@@ -131,7 +133,6 @@ export default function Deposit() {
     setPixData(null);
     setEnablePolling(false);
     stopPolling();
-    setIsProcessingPayment(false);
   };
 
   const handleMarkAsPaid = () => {
@@ -146,7 +147,6 @@ export default function Deposit() {
     if (!pixData) return;
 
     // Inicia long polling
-    setIsProcessingPayment(true);
     setEnablePolling(true);
     toast({
       title: 'Aguardando pagamento',
@@ -161,8 +161,11 @@ export default function Deposit() {
   useEffect(() => {
     if (balanceChanged && newBalance > initialBalance && address) {
       setEnablePolling(false);
-      setIsProcessingPayment(true);
       const credited = newBalance - initialBalance;
+
+      // Set animation state
+      setCreditedAmount(credited);
+      setShowSuccessAnimation(true);
 
       // Fetch latest transaction
       const fetchLatestTransaction = async () => {
@@ -190,17 +193,17 @@ export default function Deposit() {
             queryClient.invalidateQueries({ queryKey: ['backend-balance', address] });
             queryClient.invalidateQueries({ queryKey: ['wallet-transactions', address] });
 
-            // Navigate to receipt page with real tx hash
+            // Navigate to receipt page after animation (3s)
             setTimeout(() => {
               navigate(`/receipt/${latestTx.hash}`);
-            }, 1500);
+            }, 3500);
           } else {
             // Fallback: no transactions found, go to dashboard
             queryClient.invalidateQueries({ queryKey: ['backend-balance', address] });
 
             setTimeout(() => {
               navigate('/dashboard');
-            }, 1500);
+            }, 3500);
           }
         } catch (error) {
           console.error('Failed to fetch latest transaction:', error);
@@ -210,7 +213,7 @@ export default function Deposit() {
 
           setTimeout(() => {
             navigate('/dashboard');
-          }, 1500);
+          }, 3500);
         }
       };
 
@@ -223,7 +226,6 @@ export default function Deposit() {
     if (timeoutReached && isPolling === false && enablePolling) {
       setEnablePolling(false);
       stopPolling();
-      setIsProcessingPayment(true);
       toast({
         title: 'Tempo esgotado',
         description: 'Pagamento ainda não confirmado. Verifique seu saldo no Dashboard.',
@@ -239,14 +241,18 @@ export default function Deposit() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Success Animation */}
+      <SuccessAnimation
+        isVisible={showSuccessAnimation}
+        amount={creditedAmount}
+        duration={3000}
+        onComplete={() => setShowSuccessAnimation(false)}
+      />
+
       {/* Full Backdrop Loading */}
       <FullBackdropLoading
-        isOpen={isGenerating || isProcessingPayment}
-        message={
-          isGenerating
-            ? 'Gerando Pix...'
-            : 'Aguardando confirmação do pagamento...'
-        }
+        isOpen={isGenerating || isPolling}
+        message={isGenerating ? 'Gerando Pix...' : 'Aguardando confirmação do pagamento...'}
       />
 
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-lg sticky top-0 z-10">
@@ -324,7 +330,7 @@ export default function Deposit() {
             onMarkAsPaid={handleMarkAsPaid}
             onExpire={handleExpire}
             confirmLabel="Já paguei"
-            confirmLoading={isProcessingPayment}
+            confirmLoading={isPolling}
           />
         )}
       </div>
