@@ -11,6 +11,7 @@ import { History as HistoryIcon } from 'lucide-react';
 import { useAccount } from 'wagmi';
 import { useWalletTransactions } from '@/hooks/use-wallet-transactions';
 import { transformBackendTransactions } from '@/lib/utils/transform-transactions';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function History() {
   const navigate = useNavigate();
@@ -59,7 +60,15 @@ export default function History() {
         {/* Transactions List */}
         <Card className="p-6 bg-gradient-card border-border/50">
           <h2 className="text-lg font-semibold mb-4">Transações</h2>
-          {filteredTransactions.length > 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, index) => (
+                <div key={index} className="space-y-2">
+                  <Skeleton className="h-14 w-full" />
+                </div>
+              ))}
+            </div>
+          ) : filteredTransactions.length > 0 ? (
             filteredTransactions.map((tx) => (
               <TransactionItem key={tx.id} transaction={tx} className="mb-2" />
             ))
