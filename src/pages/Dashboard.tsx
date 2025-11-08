@@ -8,19 +8,24 @@ import { BalanceCard } from '@/components/wallet/BalanceCard';
 import { TransactionItem } from '@/components/wallet/TransactionItem';
 import { EmptyState } from '@/components/ui/empty-state';
 import { TransactionDetailsModal } from '@/components/wallet/TransactionDetailsModal';
-import { mockBalance, mockTransactions, mockAssets } from '@/lib/mocks/fixtures';
 import { Transaction } from '@/lib/types/wallet';
-import { formatCurrency, formatCrypto } from '@/lib/utils/format';
+import { formatCurrency } from '@/lib/utils/format';
+import { useAccount } from 'wagmi';
+import { useBackendBalance } from '@/hooks/use-backend-balance';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [balanceVisible, setBalanceVisible] = useState(true);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  
-  const brlaAsset = mockAssets.find(asset => asset.symbol === 'BRLA');
-  const totalBRLA = brlaAsset?.balance || 0;
-  const recentTransactions = mockTransactions.slice(0, 5);
+  const { address, isConnected } = useAccount();
+  const { data, isLoading, error } = useBackendBalance(address);
+  const totalBRLA = (() => {
+    const b = (data as any)?.balance;
+    const n = typeof b === 'string' ? Number(b) : (b as number | undefined);
+    return Number.isFinite(n as number) ? (n as number) : 0;
+  })();
+  const recentTransactions: Transaction[] = [];
 
   const handleTransactionClick = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
@@ -68,20 +73,20 @@ export default function Dashboard() {
           <p className="text-xs text-muted-foreground mb-2">Total investido</p>
           
           <h3 className="text-4xl font-bold mb-6">
-            {balanceVisible ? formatCurrency(totalBRLA, 'BRL') : 'R$ ••••••'}
+            {isLoading ? '---' : balanceVisible ? formatCurrency(totalBRLA, 'BRL') : 'R$ ***'}
           </h3>
 
           <div className="flex gap-3">
             <Button
               className="flex-1 h-auto py-3 bg-accent hover:bg-accent/90"
-              onClick={() => navigate('/deposit')}
+              onClick={() => navigate('/deposit')} disabled={!isConnected}
             >
               Depositar
             </Button>
             <Button
               variant="secondary"
               className="flex-1 h-auto py-3"
-              onClick={() => {/* TODO: implement withdraw */}}
+              onClick={() => {}} disabled={!isConnected}
             >
               Retirar fundos
             </Button>
@@ -133,3 +138,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+

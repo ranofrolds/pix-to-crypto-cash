@@ -15,6 +15,8 @@ const explorerUrls: Record<NetworkType, string> = {
   BTC: 'https://blockchair.com/bitcoin',
   PIX: '#',
   BASE_SEPOLIA: 'https://sepolia.basescan.org',
+  ARBITRUM_SEPOLIA: 'https://sepolia.arbiscan.io',
+  ARBITRUM_ONE: 'https://arbiscan.io',
 };
 
 export function ExplorerLink({ hash, network, type = 'tx', children }: ExplorerLinkProps) {
